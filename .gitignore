@@ -1,0 +1,13 @@
+# OS X crap
+.DS_Store
+
+# Generated files
+build
+*.css
+*.map
+*.zip
+*.tar.gz
+
+# Locally-installed dependencies
+node_modules
+typings

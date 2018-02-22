@@ -1,0 +1,114 @@
+include layout/navigation
+
+//- button.btn.btn-default.pull-right("*ngIf"="status.permissions?.everything?.manage" "[routerLink]"="['/system']")
+    span.fa.fa-cogs
+    //- |  System&nbsp;
+
+.container-fluid#home
+    .row
+        .col-md-6
+          h1
+            | QuickTerm 
+            small :: FHIR terminology client
+        .col-md-6
+          input.form-input.form-input-sm(type="text")
+        .col-md-12
+          .form-inline
+            .form-group
+                select.form-control.form-control-lg#code_system_select("[(ngModel)]"="codeSystem" "ngModelChange"="selectCodeSystem($event.target.value)")
+                    option("*ngFor"="let cs of codeSystems" "[ngValue]"="cs") {{cs.name}} ({{cs.version}})
+            .form-group
+              label(for="result_limit") Limit 
+              select.form-control.form-control-lg#result_limit("[(ngModel)]"="resultLimit")
+                  option("*ngFor"="let l of getLimits()" "[ngValue]"="l") {{l}}
+
+        .col-md-12.form("*ngIf"="codeSystem")
+          //- .form-group
+            label(for="code_system_name") Name
+            input.form-control.form-control-lg#code_system_name(type="text" "[(ngModel)]"="codeSystem.name" disabled)
+          .form-group
+            .label(for="search_text")
+            span.fa.fa-search
+              | Search {{codeSystem.name}}
+            .input-group
+              input.input-lg.form-control(autofocus="true" type="search" "[(ngModel)]"='searchFilter' name="search_text" "(keyup)"="search()" placeholder="web")
+              span.input-group-btn
+                  button.btn.btn-lg.btn-primary(type='submit' "[disabled]"="!validSearch()")
+                      span.fa.fa-search
+                      |  Search
+        .col-md-12
+          table.table.table-condensed.table-striped("*ngIf"="results")
+            thead
+              tr
+                th Display
+                th Code
+            tbody
+              tr("*ngFor"="let n of results.expansion.contains")
+                td {{n.display}}
+                td {{n.code}}
+        .col-md-3.form("*ngIf"="codeSystem")
+          h2 Details
+          dl.dl-horizontal
+            dt Version
+            dd {{codeSystem.version}}
+            dt Name
+            dd {{codeSystem.name}}
+            dt Status
+            dd {{codeSystem.status}}
+            dt Experimental
+            dd {{codeSystem.experimental}}
+            dt Date
+            dd {{codeSystem.date}}
+            dt publisher
+            dd {{codeSystem.publisher}}
+            dt Description
+            dd {{codeSystem.description}}
+            dt Copyright
+            dd {{codeSystem.copyright}}
+            dt Case Sensitive
+            dd {{codeSystem.caseSensitive}}
+            dt Value Set
+            dd {{codeSystem.valueSet}}
+            dt Hierarchy Meaning
+            dd {{codeSystem.hierarchyMeaning}}
+            dt Compositional
+            dd {{codeSystem.compositional}}
+            dt Version Needed?
+            dd {{codeSystem.versionNeeded}}
+            dt Content
+            dd {{codeSystem.content}}
+              //- h2
+                    | Find and deploy a health service
+                    span("*ngIf"="status.identity")
+                        | , {{status.identity.user.first_name}}.
+                    .btn-group.pull-right
+                        span("*ngIf"="status.identity")
+                            a("[routerLink]"="['/account']") manage
+                            |  or
+                            a("(click)"="logout()")  log out
+                        .dropdown("*ngIf"="!status.identity")
+                            button#login-menu.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='true')
+                                span.fa.fa-user
+                                |  Login&nbsp;
+                                span.caret
+                            ul.dropdown-menu(aria-labelledby='login-menu')
+                                li("*ngFor"="let idp of identityProviders")
+                                    a("[href]"='idp.redirect_url') {{idp.name}}
+    //- .row
+        .col-md-4("*ngFor"="let s of services")
+            .service("(click)"='select(s)')
+                //- .thumbnail.pull-left
+                //-     img(src="{{s.url}}/logo/medium")
+                //- h2 {{s.name}}
+
+                .row
+                    .col-sm-6
+                        //- .thumbnail
+                        img.logo(src="{{s.url}}/logo/medium")
+                    .col-sm-6
+                        h2 {{s.name}}
+                    .col-sm-12
+                        hr
+                        p {{s.description}}
+    //- button#close-service-button.btn.btn-default("*ngIf"='service' "(click)"="select(null)") Close
+    //- service("*ngIf"='service' "[service]"='service' "[licenses]"='licenses' "[status]"='status')
