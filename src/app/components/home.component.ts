@@ -33,12 +33,14 @@ export class HomeComponent implements OnInit {
 	codeSystem: CodeSystem = null;
 	codeSystemBundle: Bundle<CodeSystem> = null;
 	codeSystems: Array<CodeSystem> = new Array<CodeSystem>();
+	valueSet: ValueSet = null;
 	// licenses: Array<License> = new Array<License>();
 	// identityProviders: Array<IdentityProvider> = new Array<IdentityProvider>();
 	//
 	searchFilter: string = '';
 	results: ValueSet = null;
 	resultLimit: number = HomeComponent.LIMITS[0];
+	searching: boolean = false;
 
 	public static LIMITS: Array<number> = [10, 50, 100];
 	// status: Object;
@@ -62,6 +64,7 @@ export class HomeComponent implements OnInit {
 	getLimits() {
 		return HomeComponent.LIMITS;
 	}
+
 	processSmartLaunch(): void {
 		console.log("Checking for FHIR launch.");
 		this.activatedRoute.queryParams.subscribe(params => {
@@ -143,34 +146,55 @@ export class HomeComponent implements OnInit {
 			this.codeSystems = d.entry.map(r => r['resource']);
 			console.log("CodeSystem entries: " + this.codeSystems.length);
 			if (this.codeSystems.length > 0) {
-				this.selectCodeSystem(this.codeSystems[0]);
+				this.codeSystem = this.codeSystems[0];
+				this.codeSystemChanged();
 			}
 		});
+		this.search();
 	}
 
-	// loadInitialCodeSystems() {
-	// 	this.serviceCodeSystem.published().subscribe(d => {
-	// 		this.codeSystems = d['entry'];
-	// 	});
-	// }
+	codeSystemChanged(): void {
+		// this.codeSystem = codeSystem;
+		this.valueSet = null;
+		console.log("Selected: " + this.codeSystem.name);
+		console.log(this.codeSystem);
+		this.search();
+	}
 
-	selectCodeSystem(codeSystem: CodeSystem): void {
-		console.log(codeSystem);
-		this.codeSystem = codeSystem;
-		console.log("Selected: " + this.codeSystem);
+	unselectValueSet() {
+		this.valueSet = null;
+		console.log("Unselected ValueSet.");
+	}
+
+	selectValueSet(vs: ValueSet) {
+		if (this.valueSet == vs) {
+			this.unselectValueSet();
+		} else {
+			// this.valueSet = vs;
+			this.valueSetService.get(this.codeSystem, vs.code).subscribe(vs => {
+				this.valueSet = vs;
+				console.log("ValueSet selected:");
+				console.log(this.valueSet);
+			});
+		}
 	}
 
 	update() {
 		console.log(this.codeSystem);
 	}
+
 	search() {
 		if (this.validSearch()) {
+			this.searching = true;
+			this.valueSet = null;
 			this.valueSetService.expand(this.codeSystem, this.searchFilter, this.resultLimit).subscribe(d => {
-				this.results = d
+				this.results = d;
+				this.searching = false;
 				console.log(d);
 			});
 		} else {
 			console.log("Invalid search ignored.");
+			this.results = null;
 			// this.loadInitialCodeSystems();
 		}
 	}

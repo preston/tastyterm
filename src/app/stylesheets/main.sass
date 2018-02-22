@@ -8,15 +8,18 @@ body
   // background: url(/images/backgrounds/photo-1456428199391-a3b1cb5e93ab.jpeg) no-repeat center center fixed
   // background-size: cover
 
-#home .service
-  margin-top: 20px
-  padding: 10px
-  background: #eee
-  box-shadow: $shadow
-  border-radius: 2px
-  cursor: pointer
-  height: 300px
-  overflow-y: scroll
+#code_system_details
+  // margin-top: 20px
+  // padding: 10px
+  // background: #eee
+  // box-shadow: inset $shadow
+  // border-radius: 2px
+  // cursor: pointer
+  // height: 300px
+  // overflow-y: scroll
+  // position: static
+  // bottom: 0px
+  // left: 0px
 
   h2
     text-shadow: 0 2px 2px rgba(0,0,0,.4)
@@ -58,12 +61,9 @@ service
   .tab-pane
     background: rgba(255,255,255,.8)
 
-#users, #groups, #roles, #identity_providers, #licenses, #interfaces, #services
-  a:hover
-    cursor: pointer
-
-#services
-  .logo
-    max-height: 100px
-    max-width: 100px
-    object-fit: cover
+#results
+  tbody
+    tr:hover
+      cursor: pointer
+    tr.selected
+      background-color: rgba(255,255,230,.8)

@@ -4,96 +4,114 @@ include layout/navigation
     span.fa.fa-cogs
     //- |  System&nbsp;
 
-.container-fluid#home
+.jumbotron(*ngIf="!codeSystems")
+    //- h1 Loading this things.
+.container-fluid#home(*ngIf="codeSystems")
     .row
-        .col-md-6
+        .col-sm-6
           h1
             | QuickTerm 
-            small :: FHIR terminology client
+            small FHIR client
         .col-md-6
-          input.form-input.form-input-sm(type="text")
-        .col-md-12
-          .form-inline
+            small.pull-right
+                | using 
+                a('[href]'='quickTermService.url' target="_blank") {{quickTermService.url}}
+    .row
+        form.form-inline.col-md-10
             .form-group
-                select.form-control.form-control-lg#code_system_select("[(ngModel)]"="codeSystem" "ngModelChange"="selectCodeSystem($event.target.value)")
-                    option("*ngFor"="let cs of codeSystems" "[ngValue]"="cs") {{cs.name}} ({{cs.version}})
-            .form-group
-              label(for="result_limit") Limit 
-              select.form-control.form-control-lg#result_limit("[(ngModel)]"="resultLimit")
-                  option("*ngFor"="let l of getLimits()" "[ngValue]"="l") {{l}}
+                .input-group
+                    //- label(for='code_system_select') Code System&nbsp;
+                    .input-group-prepend
+                        i.input-group-text.fa.fa-fire
+                    select.form-control.form-control#code_system_select(name="code_system_select" "[(ngModel)]"="codeSystem" "(change)"="selectCodeSystem()")
+                        option("*ngFor"="let cs of codeSystems" "[ngValue]"="cs") {{cs.name}} ({{cs.version}})
+                    a.btn.btn-default(role="button" data-toggle="collapse" data-target="#code_system_details")
+                        u details
 
-        .col-md-12.form("*ngIf"="codeSystem")
-          //- .form-group
-            label(for="code_system_name") Name
-            input.form-control.form-control-lg#code_system_name(type="text" "[(ngModel)]"="codeSystem.name" disabled)
-          .form-group
-            .label(for="search_text")
-            span.fa.fa-search
-              | Search {{codeSystem.name}}
-            .input-group
-              input.input-lg.form-control(autofocus="true" type="search" "[(ngModel)]"='searchFilter' name="search_text" "(keyup)"="search()" placeholder="web")
-              span.input-group-btn
-                  button.btn.btn-lg.btn-primary(type='submit' "[disabled]"="!validSearch()")
-                      span.fa.fa-search
-                      |  Search
-        .col-md-12
-          table.table.table-condensed.table-striped("*ngIf"="results")
-            thead
-              tr
-                th Display
-                th Code
-            tbody
-              tr("*ngFor"="let n of results.expansion.contains")
-                td {{n.display}}
-                td {{n.code}}
-        .col-md-3.form("*ngIf"="codeSystem")
-          h2 Details
-          dl.dl-horizontal
-            dt Version
-            dd {{codeSystem.version}}
-            dt Name
-            dd {{codeSystem.name}}
-            dt Status
-            dd {{codeSystem.status}}
-            dt Experimental
-            dd {{codeSystem.experimental}}
-            dt Date
-            dd {{codeSystem.date}}
-            dt publisher
-            dd {{codeSystem.publisher}}
-            dt Description
-            dd {{codeSystem.description}}
-            dt Copyright
-            dd {{codeSystem.copyright}}
-            dt Case Sensitive
-            dd {{codeSystem.caseSensitive}}
-            dt Value Set
-            dd {{codeSystem.valueSet}}
-            dt Hierarchy Meaning
-            dd {{codeSystem.hierarchyMeaning}}
-            dt Compositional
-            dd {{codeSystem.compositional}}
-            dt Version Needed?
-            dd {{codeSystem.versionNeeded}}
-            dt Content
-            dd {{codeSystem.content}}
-              //- h2
-                    | Find and deploy a health service
-                    span("*ngIf"="status.identity")
-                        | , {{status.identity.user.first_name}}.
-                    .btn-group.pull-right
-                        span("*ngIf"="status.identity")
-                            a("[routerLink]"="['/account']") manage
-                            |  or
-                            a("(click)"="logout()")  log out
-                        .dropdown("*ngIf"="!status.identity")
-                            button#login-menu.btn.btn-default.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='true')
-                                span.fa.fa-user
-                                |  Login&nbsp;
-                                span.caret
-                            ul.dropdown-menu(aria-labelledby='login-menu')
-                                li("*ngFor"="let idp of identityProviders")
-                                    a("[href]"='idp.redirect_url') {{idp.name}}
+        form.form-inline.col-md-2
+            .form-group
+                .input-group
+                    .input-group-prepend
+                        i.input-group-text.fa.fa-list
+                    select.form-control.form-control#result_limit(name='result_limit' "[(ngModel)]"="resultLimit")
+                        option("*ngFor"="let l of getLimits()" "[ngValue]"="l") {{l}}
+                    //- label(for="result_limit") &nbsp;results
+                    span
+                        i.fa.fa-spinner.fa-spin(*ngIf="searching")
+        form.col-sm-12.form("*ngIf"="codeSystem")
+            hr
+            .form-group
+                .input-group
+                    .input-group-prepend
+                        i.input-group-text.fa.fa-search
+                    input.form-control(autofocus="true" type="search" "[(ngModel)]"='searchFilter' name="search_text" "(keyup)"="search()" placeholder="")
+                    //- span.input-group-btn
+                        button.btn.btn-primary(type='submit' "[disabled]"="!validSearch()" "(click)"="search()")
+                            span.fa.fa-search
+                            |  Search
+    .row#results("*ngIf"="results")
+            .col-md-4
+                table.table.table-condensed.table-striped.table-hover
+                    thead.thead-dark
+                        tr
+                            th Display
+                            th Code
+                    tbody
+                        tr("*ngFor"="let n of results.expansion.contains" '(click)'="selectValueSet(n)" '[class.selected]'='n == valueSet')
+                            td {{n.display}}
+                            td {{n.code}}
+            .col-md-8
+                .jumbotron(*ngIf="!valueSet && results.length > 0")
+                    h1 You should really select something.
+                dl.dl-horizontal
+                    dt
+                    dd
+                    dt
+                    dd
+                    dt
+                    dd
+                    dt
+                    dd
+                    dt
+                    dd
+    #code_system_details.collapse.show("*ngIf"="codeSystem")
+        .card.card-body
+            .row
+                .col-sm-6
+                    button.btn.btn-info.pull-left(data-toggle="collapse" data-target="#code_system_details") X
+                    h2 &nbsp;{{codeSystem.name}}
+                    hr
+                    dl.dl-horizontal
+                        dt Version
+                        dd {{codeSystem.version}}
+                        dt Name
+                        dd {{codeSystem.name}}
+                        dt Status
+                        dd {{codeSystem.status}}
+                        dt Experimental
+                        dd {{codeSystem.experimental}}
+                        dt Date
+                        dd {{codeSystem.date}}
+                        dt publisher
+                        dd {{codeSystem.publisher}}
+                .col-sm-6
+                    dl.dl-horizontal
+                        dt Description
+                        dd {{codeSystem.description}}
+                        dt Copyright
+                        dd {{codeSystem.copyright}}
+                        dt Case Sensitive
+                        dd {{codeSystem.caseSensitive}}
+                        dt Value Set
+                        dd {{codeSystem.valueSet}}
+                        dt Hierarchy Meaning
+                        dd {{codeSystem.hierarchyMeaning}}
+                        dt Compositional
+                        dd {{codeSystem.compositional}}
+                        dt Version Needed?
+                        dd {{codeSystem.versionNeeded}}
+                        dt Content
+                        dd {{codeSystem.content}}
     //- .row
         .col-md-4("*ngFor"="let s of services")
             .service("(click)"='select(s)')

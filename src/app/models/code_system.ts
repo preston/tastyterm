@@ -2,7 +2,7 @@
 
  export class CodeSystem extends FhirBase {
 	public name: string;
-	public fullUrl: string;
+	public url: string;
 	public version: string;
 	public copyright: string;
 	public publisher: string;

@@ -15,6 +15,7 @@ export class ValueSetService extends BaseService {
 
       public static PATH: string = '/ValueSet';
       public static EXPAND: string = '/$expand';
+      // public static LOOKUP: string = '/$lookup';
 
     constructor(quickTermService: QuickTermService, http: Http) {
         super(quickTermService, http);
@@ -30,6 +31,15 @@ export class ValueSetService extends BaseService {
       opts.params.append('filter', filter);
       opts.params.append('count', limit.toString());
       let obs = this.http.get(this.url() + ValueSetService.EXPAND, opts).map(res => res.json());
+      return obs;
+    }
+
+    get(codeSystem: CodeSystem, code: string): Observable<ValueSet> {
+      let opts = this.options();
+      // opts.params.append('code', code);
+      // opts.params.append('system', codeSystem.url);
+      // opts.params.append('version', codeSystem.version);
+      let obs = this.http.get(this.url() + '/' + code, opts).map(res => res.json());
       return obs;
     }
 
