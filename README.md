@@ -2,9 +2,9 @@
 
 The QuickTerm is web-based frontend for FHIR terminology services, and requires an backend to be launched.
 
-Live demonstration server: https://quickterm.healthcreek.org
-Source code and documentation: https://github.com/preston/quickterm
-Pre-built docker images: https://hub.docker.com/r/p3000/quickterm/
+* Live demonstration server: https://quickterm.healthcreek.org
+* Source code and documentation: https://github.com/preston/quickterm
+* Pre-built docker images: https://hub.docker.com/r/p3000/quickterm/
 
 ## Developer Quick Start
 
