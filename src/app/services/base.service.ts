@@ -1,10 +1,10 @@
-import {Injectable} from "@angular/core";
-import {Http} from '@angular/http';
+import { Injectable } from "@angular/core";
+import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
-import {Headers, RequestOptions} from '@angular/http';
+import { Headers, RequestOptions } from '@angular/http';
 
-import {QuickTermService} from './quickterm.service';
+import { QuickTermService } from './quickterm.service';
 
 @Injectable()
 export abstract class BaseService {
@@ -13,7 +13,8 @@ export abstract class BaseService {
     }
 
     options(): RequestOptions {
-		    return this.quickTermService.requestOptions(false);
+        // return this.quickTermService.requestOptions(false);
+        return this.quickTermService.requestOptions(true);
     }
 
 }

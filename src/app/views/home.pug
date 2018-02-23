@@ -4,76 +4,112 @@ include layout/navigation
     span.fa.fa-cogs
     //- |  System&nbsp;
 
-.jumbotron(*ngIf="!codeSystems")
+//- .jumbotron(*ngIf="!codeSystems")
     //- h1 Loading this things.
-.container-fluid#home(*ngIf="codeSystems")
+.container-fluid#home
     .row
         .col-sm-6
           h1
-            | QuickTerm 
-            small FHIR client
+            | QuickTerm
+            small  :: smart-on-fhir terminology
         .col-md-6
             small.pull-right
-                | using 
+                | using: 
                 a('[href]'='quickTermService.url' target="_blank") {{quickTermService.url}}
-    .row
-        form.form-inline.col-md-10
+    .row(*ngIf="codeSystems && codeSystems.length == 0")
+        .col-md-10.offset-md-1.jumbotron
+            h1 Bummer
+            .lead This FHIR server doesn't have any CodeSystem resources. Lame!
+    .row(*ngIf="codeSystems && codeSystems.length > 0")
+        form.form.col-md-8
             .form-group
                 .input-group
                     //- label(for='code_system_select') Code System&nbsp;
                     .input-group-prepend
-                        i.input-group-text.fa.fa-fire
-                    select.form-control.form-control#code_system_select(name="code_system_select" "[(ngModel)]"="codeSystem" "(change)"="selectCodeSystem()")
+                        i.input-group-text.fa.fa-globe
+                    select.form-control#code_system_select(name="code_system_select" "[(ngModel)]"="codeSystem" "(change)"="codeSystemChanged()")
                         option("*ngFor"="let cs of codeSystems" "[ngValue]"="cs") {{cs.name}} ({{cs.version}})
-                    a.btn.btn-default(role="button" data-toggle="collapse" data-target="#code_system_details")
-                        u details
 
-        form.form-inline.col-md-2
+        form.form.col-md-2
             .form-group
                 .input-group
                     .input-group-prepend
-                        i.input-group-text.fa.fa-list
-                    select.form-control.form-control#result_limit(name='result_limit' "[(ngModel)]"="resultLimit")
+                        i.input-group-text.fa.fa-list-ol
+                    select.form-control#result_limit(name='result_limit' "[(ngModel)]"="resultLimit")
                         option("*ngFor"="let l of getLimits()" "[ngValue]"="l") {{l}}
                     //- label(for="result_limit") &nbsp;results
-                    span
-                        i.fa.fa-spinner.fa-spin(*ngIf="searching")
-        form.col-sm-12.form("*ngIf"="codeSystem")
-            hr
+        form.form.col-md-2
+            //- .form-group
+            a.btn.btn-default(role="button" data-toggle="collapse" data-target="#code_system_details")
+                        u details
+
+        form.form.col-sm-8("*ngIf"="codeSystem")
+            //- hr
             .form-group
                 .input-group
                     .input-group-prepend
                         i.input-group-text.fa.fa-search
-                    input.form-control(autofocus="true" type="search" "[(ngModel)]"='searchFilter' name="search_text" "(keyup)"="search()" placeholder="")
+                    input.form-control.form-control(autofocus="true" type="search" "[(ngModel)]"='searchFilter' name="search_text" "(keyup)"="search()" placeholder="")
                     //- span.input-group-btn
                         button.btn.btn-primary(type='submit' "[disabled]"="!validSearch()" "(click)"="search()")
                             span.fa.fa-search
                             |  Search
-    .row#results("*ngIf"="results")
-            .col-md-4
-                table.table.table-condensed.table-striped.table-hover
-                    thead.thead-dark
-                        tr
-                            th Display
-                            th Code
-                    tbody
-                        tr("*ngFor"="let n of results.expansion.contains" '(click)'="selectValueSet(n)" '[class.selected]'='n == valueSet')
-                            td {{n.display}}
-                            td {{n.code}}
-            .col-md-8
-                .jumbotron(*ngIf="!valueSet && results.length > 0")
-                    h1 You should really select something.
-                dl.dl-horizontal
-                    dt
-                    dd
-                    dt
-                    dd
-                    dt
-                    dd
-                    dt
-                    dd
-                    dt
-                    dd
+        form.form.col-sm-2
+            .form-group
+                    span
+                        i.fa.fa-spinner.fa-spin.fa-2x(*ngIf="searching")
+    .row
+        div.col-md-10.offset-md-1(*ngIf="results && results.expansion?.contains == null")
+            .text-center
+                i.text-default No results!
+        div.col-sm-4("*ngIf"="results && results.expansion?.contains")
+        
+            table.table.table-condensed.table-striped.table-hover#results
+                thead.thead-dark
+                    tr
+                        th Display
+                        th Code
+                tbody
+                    tr("*ngFor"="let n of results.expansion.contains" '(click)'="selectValueSet(n)" '[class.selected]'='n == valueSet')
+                        td {{n.display}}
+                        td {{n.code}}
+        .col-sm-8("*ngIf"="results && results.expansion?.contains")
+            .jumbotron("*ngIf"="!valueSet && results.length > 0")
+                h1 You should really select something.
+            div("*ngIf"="valueSet && valueSetParameters")
+                //- div("*ngFor"="let p of valueSetParameters.parameter")
+                h1 {{valueSetParameters.display}}
+                | From {{valueSetParameters.name}} ({{valueSetParameters.version}})
+                hr
+                section
+                    h2 Properties
+                    table.table.table-condensed
+                        thead
+                            tr
+                                th Code
+                                th Value
+                        tbody
+                            tr("*ngFor"="let p of valueSetParameters.properties")
+                                td {{p['code']}}
+                                td {{partValue(p)}}
+                section
+                    h2 Designations
+                    table.table.table-condensed
+                        thead
+                            tr
+                                th Value
+                                th Use
+                                th Language
+                        tbody
+                            tr("*ngFor"="let d of valueSetParameters.designations")
+                                td {{partValue(d)}}
+                                td
+                                    | {{d['use']['code']}}
+                                    | ({{d['use']['display']}})
+                                    br
+                                    i {{d['use']['system']}}
+                                td {{d['language']}}
+
     #code_system_details.collapse.show("*ngIf"="codeSystem")
         .card.card-body
             .row

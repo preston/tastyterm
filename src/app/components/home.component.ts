@@ -11,15 +11,18 @@ import { ToasterModule, ToasterService } from 'angular2-toaster/angular2-toaster
 
 import { SlideComponent, CarouselComponent, CarouselModule } from 'ngx-bootstrap';
 
+
+import { QuickTermService } from '../services/quickterm.service';
 import { CodeSystemService } from '../services/code_system.service';
 import { ValueSetService } from '../services/value_set.service';
-import { QuickTermService } from '../services/quickterm.service';
+import { ConceptMapService } from '../services/concept_map.service';
 
 // import {XmlExporterCodeSystem} from '../codeSystems/xml_exporter.service';
 
-import { Http, RequestOptions, RequestOptionsArgs } from '@angular/http';
+import { Http, RequestOptions, RequestOptionsArgs, Headers } from '@angular/http';
 import { ActivatedRoute } from '@angular/router';
 import { access } from 'fs';
+import { Parameters } from '../models/parameters';
 
 @Component({
 	selector: 'home',
@@ -30,10 +33,11 @@ import { access } from 'fs';
 export class HomeComponent implements OnInit {
 
 	// The currently selected service, if any.
-	codeSystem: CodeSystem = null;
-	codeSystemBundle: Bundle<CodeSystem> = null;
+	codeSystem: CodeSystem;
+	codeSystemBundle: Bundle<CodeSystem>;
 	codeSystems: Array<CodeSystem> = new Array<CodeSystem>();
-	valueSet: ValueSet = null;
+	valueSet: ValueSet;
+	valueSetParameters: Parameters;
 	// licenses: Array<License> = new Array<License>();
 	// identityProviders: Array<IdentityProvider> = new Array<IdentityProvider>();
 	//
@@ -44,10 +48,12 @@ export class HomeComponent implements OnInit {
 
 	public static LIMITS: Array<number> = [10, 50, 100];
 	// status: Object;
+	public static FALLBACK_SERVER: string = "https://ontoserver.hspconsortium.org/fhir";
 
 	constructor(private quickTermService: QuickTermService,
 		private codeSystemService: CodeSystemService,
 		private valueSetService: ValueSetService,
+		private conceptMapService: ConceptMapService,
 		private toasterService: ToasterService,
 		private activatedRoute: ActivatedRoute,
 		private http: Http,
@@ -55,12 +61,9 @@ export class HomeComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		// Just a reasonable default. Overriden on SMART launch!
-		this.quickTermService.url = "https://ontoserver.hspconsortium.org/fhir";
 		this.processSmartLaunch();
-		this.reload();
-		// this.detectJwtLaunch();
 	}
+
 	getLimits() {
 		return HomeComponent.LIMITS;
 	}
@@ -68,86 +71,65 @@ export class HomeComponent implements OnInit {
 	processSmartLaunch(): void {
 		console.log("Checking for FHIR launch.");
 		this.activatedRoute.queryParams.subscribe(params => {
-			for (let p in params) {
-				console.log(p);
-			}
+			// for (let p in params) {
+			// 	console.log(p);
+			// }
 			console.log("Checking for FHIR launch.");
 			let code: string = params['code'];
 			let state: string = params['state'];
 			if (code && state) {
+				// We should be receiving an authenticated launch!
+				// Load our OAuth parameters stored in the session.
+				let tmp = JSON.parse(localStorage[state]);
+				this.quickTermService.url = tmp.serviceUri;
 
-				// load the app parameters stored in the session
-				var tmp = JSON.parse(sessionStorage[state]);  // load app session
-				var tokenUri = tmp.tokenUri;
-				var clientId = tmp.clientId;
-				var secret = tmp.secret;
-				var serviceUri = tmp.serviceUri;
-				var redirectUri = tmp.redirectUri;
+				let tokenUri = tmp.tokenUri;
+				let clientId = tmp.clientId;
+				let secret = tmp.secret;
+				let redirectUri = tmp.redirectUri;
 
 				// Prep the token exchange call parameters
-				var data = {
-					code: code,
-					grant_type: 'authorization_code',
-					redirect_uri: redirectUri,
-					client_id: clientId
-				}
-				let d = new FormData();
-				// obtain authorization token from the authorization service using the authorization code
-				// let opts = new RequestOptions();
-				// let args = new RequestOp();
-				// opts.params = new URLSearchParams();
-				// opts.
-				d.append('code', code);
-				d.append('grant_type', 'authorization_code');
-				d.append('redirect_uri', redirectUri);
-				d.append('client_id', clientId);
-				this.http.post(tokenUri, JSON.stringify(data)).map(resp => resp.json()).subscribe(resp => {
+				let body = 'grant_type=authorization_code'
+					+ '&code=' + code
+					+ '&redirect_uri=' + encodeURI(redirectUri)
+					+ '&client_id=' + clientId;
+				let opts = new RequestOptions();
+				opts.headers = new Headers();
+				opts.headers.append('Content-Type', 'application/x-www-form-urlencoded');
+				this.http.post(tokenUri, body, opts).map(resp => resp.json()).subscribe(resp => {
 					// should get back the access token and the patient ID
 					let accessToken = resp['access_token'];
 					let patientId = resp['patient'];
-					localStorage.setItem(QuickTermService.LOCAL_STORAGE_JWT_KEY, accessToken);
-
-					// and now we can use these to construct standard FHIR
-					// REST calls to obtain patient resources with the
-					// SMART on FHIR-specific authorization header...
-					// Let's, for example, grab the patient resource and
-					// print the patient name on the screen
-					var url = serviceUri + "/CodeSystem"; //  + patientId;
-					this.http.get(url).subscribe(r2 => {
-						console.log("FINALLY: " + r2)
-					});
-					// $.ajax({
-					// 	url: url,
-					// 	type: "GET",
-					// 	dataType: "json",
-					// 	headers: {
-					// 		"Authorization": "Bearer " + accessToken
-					// 	},
-					// }).done(function (pt) {
-					// 	var name = pt.name[0].given.join(" ") + " " + pt.name[0].family.join(" ");
-					// 	document.body.innerHTML += "<h3>Patient: " + name + "</h3>";
-					// });
+					localStorage.setItem(QuickTermService.STORAGE_BEARER_TOKEN_KEY, accessToken);
+					this.reloadCodeSystems();
 				});
-
+			} else {
+				// We're starting in standalone mode, and need a fallback server.
+				// Just a reasonable default! This is overriden on SMART launch.
+				this.quickTermService.url = HomeComponent.FALLBACK_SERVER;
+				this.reloadCodeSystems();
 			}
 		})
 	}
 
 
-	reload() {
-		this.loadCodeSystems();
-	}
-
-	loadCodeSystems() {
+	reloadCodeSystems() {
 		this.codeSystemBundle = null;
 		this.codeSystems = null;
 		this.codeSystemService.bundle().subscribe(d => {
 			this.codeSystemBundle = d;
-			this.codeSystems = d.entry.map(r => r['resource']);
-			console.log("CodeSystem entries: " + this.codeSystems.length);
-			if (this.codeSystems.length > 0) {
-				this.codeSystem = this.codeSystems[0];
-				this.codeSystemChanged();
+			if (d.total > 0) {
+				this.codeSystems = d.entry.map(r => r['resource']);
+				console.log("CodeSystem entries: " + this.codeSystems.length);
+				if (this.codeSystems.length > 0) {
+					this.codeSystem = this.codeSystems[0];
+					this.codeSystemChanged();
+					this.toasterService.pop('success', 'Welcome!', this.codeSystems.length + ' code systems are available.');
+				}
+			} else {
+				console.log("Server doesn't have any CodeSystem resources!");
+				this.toasterService.pop('warning', 'We need to talk..', "It appears the server either doesn't support code system resources, or doesn't have any.");
+				this.codeSystems = [];
 			}
 		});
 		this.search();
@@ -163,19 +145,33 @@ export class HomeComponent implements OnInit {
 
 	unselectValueSet() {
 		this.valueSet = null;
+		this.valueSetParameters = null;
 		console.log("Unselected ValueSet.");
+	}
+	partValue(p: any) {
+		return p['value'] || p['valueCode'] || p['valueCoding'] || p['valueString'] || p['valueBoolean'];
 	}
 
 	selectValueSet(vs: ValueSet) {
 		if (this.valueSet == vs) {
 			this.unselectValueSet();
 		} else {
-			// this.valueSet = vs;
-			this.valueSetService.get(this.codeSystem, vs.code).subscribe(vs => {
-				this.valueSet = vs;
-				console.log("ValueSet selected:");
-				console.log(this.valueSet);
+			this.valueSet = vs;
+			console.log("ValueSet selected:");
+			// this.valueSetService.get(this.codeSystem, vs.code).subscribe(vs => {
+			this.codeSystemService.lookup(this.codeSystem, vs.code).subscribe(params => {
+				this.valueSetParameters = params;
+				// this.valueSetParameters.unpack();
+				console.log("ValueSet Parameters:");
+				console.log(this.valueSetParameters);
 			});
+
+			// TODO Figure out what to do with required "target" parameter.
+			// this.conceptMapService.translate(this.codeSystem, vs.code).subscribe(vs => {
+			// 	this.valueSet = vs;
+			// 	console.log("ValueSet selected:");
+			// 	console.log(this.valueSet);
+			// });
 		}
 	}
 
@@ -203,14 +199,14 @@ export class HomeComponent implements OnInit {
 		return this.searchFilter.length > 2;
 	}
 
-	// logout() {
-	// 	localStorage.removeItem(QuickTermCodeSystem.LOCAL_STORAGE_JWT_KEY);
-	// 	// this.quickTermService.logout().subscribe(d => {
-	// 		this.loadCodeSystems();
-	// 	// 	console.log("Logout complete.");
-	// 		this.toasterCodeSystem.pop('success', 'Logged out.', 'See you next time!');
-	// 	// });
-	// }
+	logout() {
+		localStorage.removeItem(QuickTermService.STORAGE_BEARER_TOKEN_KEY);
+		// this.quickTermService.logout().subscribe(d => {
+		this.reloadCodeSystems();
+		// 	console.log("Logout complete.");
+		this.toasterService.pop('success', 'Logged out.', 'See you next time!');
+		// });
+	}
 
 
 }

@@ -15,7 +15,7 @@ export class ValueSetService extends BaseService {
 
       public static PATH: string = '/ValueSet';
       public static EXPAND: string = '/$expand';
-      // public static LOOKUP: string = '/$lookup';
+      public static LOOKUP: string = '/$lookup';
 
     constructor(quickTermService: QuickTermService, http: Http) {
         super(quickTermService, http);
@@ -25,6 +25,7 @@ export class ValueSetService extends BaseService {
         return this.quickTermService.url + ValueSetService.PATH;
     }
 
+    // Essentially a search function
     expand(codeSystem: CodeSystem, filter: string, limit: number): Observable<ValueSet> {
       let opts = this.options();
       opts.params.append('identifier', codeSystem.valueSet);
@@ -36,10 +37,10 @@ export class ValueSetService extends BaseService {
 
     get(codeSystem: CodeSystem, code: string): Observable<ValueSet> {
       let opts = this.options();
-      // opts.params.append('code', code);
-      // opts.params.append('system', codeSystem.url);
-      // opts.params.append('version', codeSystem.version);
-      let obs = this.http.get(this.url() + '/' + code, opts).map(res => res.json());
+      opts.params.append('code', code);
+      opts.params.append('system', codeSystem.url);
+      opts.params.append('version', codeSystem.version);
+      let obs = this.http.get(this.url() + '/' + ValueSetService.LOOKUP, opts).map(res => res.json());
       return obs;
     }
 
