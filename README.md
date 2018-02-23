@@ -2,13 +2,16 @@
 
 The QuickTerm is web-based frontend for FHIR terminology services, and requires an backend to be launched.
 
+Live demonstration server: https://quickterm.healthcreek.org
+Source code and documentation: https://github.com/preston/quickterm
+Pre-built docker images: https://hub.docker.com/r/p3000/quickterm/
+
 ## Developer Quick Start
 
 This is an [AngularJS](https://angular.io) project using `grunt` as the build system, [pug](https://pugjs.org/api/getting-started.html) for HTML templates, [SASS](http://sass-lang.com) for CSS and [Bootstrap](http://getbootstrap.com/) for layout. `npm` is the package manager. Assuming you already have node installed via `brew install node` or similar:
 
 	npm install -g grunt typings
 	npm install # to install project development dependencies
-	typings install # to install TypeScript declarations
 
 To run in development mode, just:
 
@@ -25,6 +28,7 @@ First, build:
 Then, assuming you've already familiar with [Docker](https://www.docker.com) awesomeness and have it installed, plop the build into a wicked-fast [nginx](http://nginx.org) web server container using the including Dockerfile with:
 
 	docker build -t p3000/quickterm:latest . # though you probably want your own repo and tag strings :)
+	docker push p3000/quickterm:latest # upload it to your repository
 
 ## Production Deployment
 
