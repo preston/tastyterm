@@ -1,6 +1,6 @@
 # QuickTerm: FHIR Terminology Client
 
-The QuickTerm is web-based frontend for FHIR terminology services, and requires an backend to be launched.
+The QuickTerm is web-based frontend for FHIR terminology services. When run in standalone mode it will automatically connect to the HSPC terminology service. When launched in SMART-on-FHIR mode, it will use an authorization service and FHIR backend of your choice.
 
 * **Live demonstration server: https://quickterm.healthcreek.org**
 * Source code and documentation: https://github.com/preston/quickterm
