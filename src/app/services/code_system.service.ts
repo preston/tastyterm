@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { BaseService } from "./base.service";
 
-import { QuickTermService } from './quickterm.service';
+import { QuickTermService } from './tastyterm.service';
 
 import { Bundle } from "../models/bundle";
 import { Parameters } from "../models/parameters";

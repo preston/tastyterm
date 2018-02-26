@@ -1,10 +1,10 @@
-# QuickTerm: FHIR Terminology Client
+# TastyTerm: FHIR Terminology Client
 
-The QuickTerm is web-based frontend for FHIR terminology services. When run in standalone mode it will automatically connect to the HSPC terminology service. When launched in SMART-on-FHIR mode, it will use an authorization service and FHIR backend of your choice.
+The TastyTerm is web-based frontend for FHIR terminology services. When run in standalone mode it will automatically connect to the HSPC terminology service. When launched in SMART-on-FHIR mode, it will use an authorization service and FHIR backend of your choice.
 
-* **Live demonstration server: https://quickterm.healthcreek.org**
-* Source code and documentation: https://github.com/preston/quickterm
-* Pre-built docker images: https://hub.docker.com/r/p3000/quickterm/
+* **Live demonstration server: https://tastyterm.healthcreek.org**
+* Source code and documentation: https://github.com/preston/tastyterm
+* Pre-built docker images: https://hub.docker.com/r/p3000/tastyterm/
 
 ## Developer Quick Start
 
@@ -27,14 +27,14 @@ First, build:
 
 Then, assuming you've already familiar with [Docker](https://www.docker.com) awesomeness and have it installed, plop the build into a wicked-fast [nginx](http://nginx.org) web server container using the including Dockerfile with:
 
-	docker build -t p3000/quickterm:latest . # though you probably want your own repo and tag strings :)
-	docker push p3000/quickterm:latest # upload it to your repository
+	docker build -t p3000/tastyterm:latest . # though you probably want your own repo and tag strings :)
+	docker push p3000/tastyterm:latest # upload it to your repository
 
 ## Production Deployment
 
-Extremely easy in your existing Dockerized hosting environment by pointing it at your QuickTerm Server installation. Just:
+Extremely easy in your existing Dockerized hosting environment by pointing it at your TastyTerm installation. Just:
 
-	docker run -d -p 9000:80 --restart unless-stopped p3000/quickterm:latest # or any official tag
+	docker run -d -p 9000:80 --restart unless-stopped p3000/tastyterm:latest # or any official tag
 
 And you're done. No environment variables or further configuration are needed. Jedi's may use your existing Kubernetes, Open Shift etc installations as you see fit. :)
 

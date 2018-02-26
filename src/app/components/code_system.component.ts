@@ -9,7 +9,7 @@ import {SlideComponent, CarouselComponent, CarouselModule} from 'ngx-bootstrap';
 
 import {CodeSystem} from '../models/code_system';
 
-import {QuickTermService} from '../services/quickterm.service';
+import {QuickTermService} from '../services/tastyterm.service';
 import {CodeSystemService} from '../services/code_system.service';
 
 @Component({

@@ -1,8 +1,8 @@
 {
-  "name": "quickterm",
-  "description": "Web frontend for QuickTerm Server.",
+  "name": "tastyterm",
+  "description": "Web frontend for FHIR terminology servers.",
   "license": "ISC",
-  "repository": "git@github.com:preston/quickterm.git",
+  "repository": "git@github.com:preston/tastyterm.git",
   "author": "Preston Lee",
   "scripts": {
     "start": "grunt",

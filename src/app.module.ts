@@ -14,7 +14,7 @@ import {ApiComponent} from './app/components/api.component';
 import {CodeSystemComponent} from './app/components/code_system.component';
 import {ConceptMapComponent} from './app/components/concept_map.component';
 
-import {QuickTermService} from './app/services/quickterm.service';
+import {QuickTermService} from './app/services/tastyterm.service';
 import {CodeSystemService} from './app/services/code_system.service';
 import {ValueSetService} from './app/services/value_set.service';
 import {ConceptMapService} from './app/services/concept_map.service';

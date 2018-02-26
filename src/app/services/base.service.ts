@@ -4,7 +4,7 @@ import 'rxjs/add/operator/map';
 
 import { Headers, RequestOptions } from '@angular/http';
 
-import { QuickTermService } from './quickterm.service';
+import { QuickTermService } from './tastyterm.service';
 
 @Injectable()
 export abstract class BaseService {

@@ -12,7 +12,7 @@ import { ToasterModule, ToasterService } from 'angular2-toaster/angular2-toaster
 import { SlideComponent, CarouselComponent, CarouselModule } from 'ngx-bootstrap';
 
 
-import { QuickTermService } from '../services/quickterm.service';
+import { QuickTermService } from '../services/tastyterm.service';
 import { CodeSystemService } from '../services/code_system.service';
 import { ValueSetService } from '../services/value_set.service';
 import { ConceptMapService } from '../services/concept_map.service';

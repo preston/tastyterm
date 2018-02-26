@@ -4,7 +4,7 @@ import 'rxjs/add/operator/map';
 import {Observable} from 'rxjs/Observable';
 
 import {BaseService} from "./base.service";
-import {QuickTermService} from './quickterm.service';
+import {QuickTermService} from './tastyterm.service';
 
 import {Bundle} from '../models/Bundle';
 import {CodeSystem} from '../models/code_system';

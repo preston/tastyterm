@@ -10,7 +10,7 @@ import {SlideComponent, CarouselComponent, CarouselModule} from 'ngx-bootstrap';
 import {Bundle} from '../models/bundle';
 import {ConceptMap} from '../models/concept_map';
 
-import {QuickTermService} from '../services/quickterm.service';
+import {QuickTermService} from '../services/tastyterm.service';
 import {ConceptMapService} from '../services/concept_map.service';
 
 @Component({
