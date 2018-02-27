@@ -10,7 +10,7 @@ include layout/navigation
     .row
         .col-sm-6
           h1
-            | QuickTerm
+            | TastyTerm
             small  :: smart-on-fhir terminology
         .col-md-6
             small.pull-right
@@ -59,10 +59,13 @@ include layout/navigation
                     span
                         i.fa.fa-spinner.fa-spin.fa-2x(*ngIf="searching")
     .row
+        //- For when a search has been completed, but there are zero results.
         div.col-md-10.offset-md-1(*ngIf="results && results.expansion?.contains == null")
             .text-center
                 i.text-default No results!
-        div.col-sm-4("*ngIf"="results && results.expansion?.contains")
+        
+        //- For searches *with* results.
+        div.col-sm-3("*ngIf"="results && results.expansion?.contains")
         
             table.table.table-condensed.table-striped.table-hover#results
                 thead.thead-dark
@@ -73,42 +76,47 @@ include layout/navigation
                     tr("*ngFor"="let n of results.expansion.contains" '(click)'="selectValueSet(n)" '[class.selected]'='n == valueSet')
                         td {{n.display}}
                         td {{n.code}}
-        .col-sm-8("*ngIf"="results && results.expansion?.contains")
-            .jumbotron("*ngIf"="!valueSet && results.length > 0")
-                h1 You should really select something.
+        .col-sm-9("*ngIf"="results && results.expansion?.contains")
+
+            // This is super annoying since it causes flicker while waiting for autoselection.
+            //- .jumbotron("*ngIf"="!valueSet && results.expansion?.contains")
+                h1 Hey bub.. you should really select something.
             div("*ngIf"="valueSet && valueSetParameters")
+                //- Graph wizardry!
+                div.col-sm-12
                 //- div("*ngFor"="let p of valueSetParameters.parameter")
                 h1 {{valueSetParameters.display}}
                 | From {{valueSetParameters.name}} ({{valueSetParameters.version}})
                 hr
-                section
-                    h2 Properties
-                    table.table.table-condensed
-                        thead
-                            tr
-                                th Code
-                                th Value
-                        tbody
-                            tr("*ngFor"="let p of valueSetParameters.properties")
-                                td {{p['code']}}
-                                td {{partValue(p)}}
-                section
-                    h2 Designations
-                    table.table.table-condensed
-                        thead
-                            tr
-                                th Value
-                                th Use
-                                th Language
-                        tbody
-                            tr("*ngFor"="let d of valueSetParameters.designations")
-                                td {{partValue(d)}}
-                                td
-                                    | {{d['use']['code']}}
-                                    | ({{d['use']['display']}})
-                                    br
-                                    i {{d['use']['system']}}
-                                td {{d['language']}}
+                .row
+                    section.col-sm-5
+                        h2 Properties
+                        table.table.table-condensed
+                            thead
+                                tr
+                                    th Code
+                                    th Value
+                            tbody
+                                tr("*ngFor"="let p of valueSetParameters.properties")
+                                    td {{p['code']}}
+                                    td {{partValue(p)}}
+                    section.col-sm-7
+                        h2 Designations
+                        table.table.table-condensed
+                            thead
+                                tr
+                                    th Value
+                                    th Use
+                                    th Language
+                            tbody
+                                tr("*ngFor"="let d of valueSetParameters.designations")
+                                    td {{partValue(d)}}
+                                    td
+                                        | {{d['use']['code']}}
+                                        | ({{d['use']['display']}})
+                                        br
+                                        i {{d['use']['system']}}
+                                    td {{d['language']}}
 
     #code_system_details.collapse.show("*ngIf"="codeSystem")
         .card.card-body

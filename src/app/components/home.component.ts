@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit {
 	searchFilter: string = '';
 	results: ValueSet = null;
 	resultLimit: number = HomeComponent.LIMITS[0];
-	searching: boolean = false;
+	searching: boolean = false; // Used for visually indicating when a search is in progress.
 
 	public static LIMITS: Array<number> = [10, 50, 100];
 	// status: Object;
@@ -186,7 +186,13 @@ export class HomeComponent implements OnInit {
 			this.valueSetService.expand(this.codeSystem, this.searchFilter, this.resultLimit).subscribe(d => {
 				this.results = d;
 				this.searching = false;
+				console.log("Search results:");
 				console.log(d);
+				if(this.results.expansion && this.results.expansion['contains'].length > 0) {
+					this.selectValueSet(this.results.expansion['contains'][0]);
+					// console.log("Setting default ValueSet selection to:");
+					// console.log(this.valueSet);
+				}
 			});
 		} else {
 			console.log("Invalid search ignored.");
