@@ -188,7 +188,8 @@ export class HomeComponent implements OnInit {
 				this.searching = false;
 				console.log("Search results:");
 				console.log(d);
-				if(this.results.expansion && this.results.expansion['contains'].length > 0) {
+				// TypeScript really needs safe navigation. :(
+				if(this.results.expansion && this.results.expansion['contains'] && this.results.expansion['contains'].length > 0) {
 					this.selectValueSet(this.results.expansion['contains'][0]);
 					// console.log("Setting default ValueSet selection to:");
 					// console.log(this.valueSet);

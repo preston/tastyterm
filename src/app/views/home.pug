@@ -85,9 +85,11 @@ include layout/navigation
                 //- Graph wizardry!
                 div.col-sm-12
                 //- div("*ngFor"="let p of valueSetParameters.parameter")
-                h1 {{valueSetParameters.display}}
-                | From {{valueSetParameters.name}} ({{valueSetParameters.version}})
-                hr
+                // This is duplicative with stuff shown elsewhere.
+                //- #value_set_header
+                    h1 {{valueSetParameters.display}}
+                    | From {{valueSetParameters.name}} ({{valueSetParameters.version}})
+                    hr
                 .row
                     section.col-sm-5
                         h2 Properties
