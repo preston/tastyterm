@@ -1,4 +1,4 @@
-h1 Visualizer
+//- h1 Visualizer
 //- div(style="position: absolute; top: 50px; left: 50px; right: 50px; bottom: 50px;")
 #visualization-container(style="width: 100%")
 	ngx-graph.chart-container("[class]"="theme" "autoZoom"="true" "[view]"="view" "[legend]"="showLegend" "[links]"="hierarchicalGraph.links" "(legendlabelclick)"="onLegendLabelClick($event)" "[nodes]"="hierarchicalGraph.nodes" "[scheme]"="colorScheme" "[orientation]"="orientation" "[curve]"="interpolationCurve" "(select)"="select($event)")
@@ -13,5 +13,5 @@ h1 Visualizer
 			svg:g.edge
 				svg:path.line(stroke-width="2" marker-end="url(#arrow)")
 				svg:text.edge-label(text-anchor="middle")
-					textpath.text-path([attr.href]="'#' + link.id" "[style.dominant-baseline]"="link.dominantBaseline" startoffset="50%")
+					textpath.text-path("[attr.href]"="'#' + link.id" "[style.dominant-baseline]"="link.dominantBaseline" startoffset="50%")
 						| {{link.label}}
