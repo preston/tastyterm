@@ -4,6 +4,8 @@ import {Routes, RouterModule} from '@angular/router';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ToasterModule, ToasterService} from 'angular2-toaster/angular2-toaster';
+import {NgxGraphModule} from "@swimlane/ngx-graph";
+
 // import {DragulaModule} from 'ng2-dragula/ng2-dragula';
 
 import {CarouselModule} from 'ngx-bootstrap';
@@ -13,6 +15,7 @@ import {HomeComponent} from './app/components/home.component';
 import {ApiComponent} from './app/components/api.component';
 import {CodeSystemComponent} from './app/components/code_system.component';
 import {ConceptMapComponent} from './app/components/concept_map.component';
+import { CodeVisualizerComponent } from './app/components/code_visualizer.component';
 
 import {QuickTermService} from './app/services/tastyterm.service';
 import {CodeSystemService} from './app/services/code_system.service';
@@ -45,13 +48,15 @@ const routing: ModuleWithProviders = RouterModule.forRoot(appRoutes);
         HttpModule,
       BrowserAnimationsModule, // For Toaster
         ToasterModule,
-        CarouselModule
+        CarouselModule,
+        NgxGraphModule
     ],
     declarations: [
         AppComponent,
         ApiComponent,
         HomeComponent,
-        CodeSystemComponent
+        CodeSystemComponent,
+        CodeVisualizerComponent
         // CarouselComponent,
         // SlideComponent
     ],   // components and directives

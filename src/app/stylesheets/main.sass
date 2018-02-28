@@ -21,6 +21,9 @@ body
     max-width: 200px
     object-fit: cover
 
+.ngx-charts-outer
+  // min-height: 300px
+
 #close-button
   position: absolute
   z-index: 20
@@ -34,3 +37,37 @@ body
       cursor: pointer
     tr.selected
       background-color: rgba(255,255,230,.8)
+
+
+
+.arrow-down
+  width: 0
+  height: 0
+  border-left: 5px solid transparent
+  border-right: 5px solid transparent
+  border-top: 5px solid #fff
+  display: inline-block
+  margin-right: 5px
+
+.arrow-right
+  margin-right: 5px
+  display: inline-block
+  width: 0
+  height: 0
+  border-top: 5px solid transparent
+  border-bottom: 5px solid transparent
+  border-left: 5px solid #fff
+
+.graph
+  .node
+    text
+      fill: #fff
+      font-size: 12px
+      font-weight: bold
+
+  .edge
+    path
+      stroke: #666 !important
+
+  .arrow-head
+    fill: #666
