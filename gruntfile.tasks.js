@@ -9,6 +9,11 @@ module.exports = function (grunt) {
   var versionData = grunt.file.readJSON('src/version.json').version,
     version = versionData.major + '.' + versionData.minor + '.' + versionData.patch;
 
+
+  var publicOAuthId = process.env.TASTYTERM_OAUTH_CLIENT_ID
+    ? process.env.TASTYTERM_OAUTH_CLIENT_ID
+    : "0a3dc7ab-fd0b-408a-bbb9-4224d8451e81";
+
   // Project configuration
   var config = {
     mode: 'development',
@@ -110,6 +115,10 @@ module.exports = function (grunt) {
           sourceMapFilename: "[name].bundle.js.map"
         },
         plugins: [
+          // compile time plugins
+          new webpack.DefinePlugin({
+            'process.env.TASTYTERM_OAUTH_CLIENT_ID': JSON.stringify(publicOAuthId),
+          }),
           // new webpack.optimize.DedupePlugin(),
           // new webpack.optimize.UglifyJsPlugin({
           //     beautify: false,
@@ -139,11 +148,13 @@ module.exports = function (grunt) {
           // preLoaders: [{
           //     loader: "source-map-loader"
           // }],
-          rules: [{
-            test: /\.tsx?$/,
-            use: ['ts-loader', 'angular2-router-loader'],
-            exclude: /node_modules/
-          }],
+          rules: [
+            {
+              test: /\.tsx?$/,
+              use: ['ts-loader', 'angular2-router-loader'],
+              exclude: /node_modules/
+            }
+          ],
           noParse: [path.join(path.resolve(__dirname, 'node_modules'), '@angular', 'bower_components')],
         },
         devServer: {
