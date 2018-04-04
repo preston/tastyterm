@@ -1,27 +1,44 @@
-# CliSetup
+# TastyTerm: FHIR Terminology Client
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.3.
+The TastyTerm is web-based frontend for FHIR terminology services. When run in standalone mode it will automatically connect to the HSPC terminology service. When launched in SMART-on-FHIR mode, it will use an authorization service and FHIR backend of your choice.
 
-## Development server
+* **Live demonstration server: https://tastyterm.healthcreek.org**
+* Source code and documentation: https://github.com/preston/tastyterm
+* Pre-built docker images: https://hub.docker.com/r/p3000/tastyterm/
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Developer Quick Start
 
-## Code scaffolding
+This is an [Angular](https://angular.io) project using `ANGULAR CLI` as the build system, [pug](https://pugjs.org/api/getting-started.html) for HTML templates, [SASS](http://sass-lang.com) for CSS and [Bootstrap](http://getbootstrap.com/) for layout. `npm` is the package manager. Assuming you already have node installed via `brew install node` or similar:
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+	npm install -g @angular/cli
+	npm install # to install project development dependencies
 
-## Build
+To run in development mode, just:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+	ng serve # to serve the project and automatically recompile on file changes
 
-## Running unit tests
+Visit [http://localhost:4200](http://localhost:4200) and do your thang. :)
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Building for Production
 
-## Running end-to-end tests
+First, build:
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+	ng build # to build your local copy with any local changes
 
-## Further help
+Then, assuming you've already familiar with [Docker](https://www.docker.com) awesomeness and have it installed, plop the build into a wicked-fast [nginx](http://nginx.org) web server container using the including Dockerfile with:
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+	docker build -t p3000/tastyterm:latest . # though you probably want your own repo and tag strings :)
+	docker push p3000/tastyterm:latest # upload it to your repository
+
+## Production Deployment
+
+Extremely easy in your existing Dockerized hosting environment by pointing it at your TastyTerm installation. Just:
+
+	docker run -d -p 9000:80 --restart unless-stopped p3000/tastyterm:latest # or any official tag
+
+And you're done. No environment variables or further configuration are needed. Jedi's may use your existing Kubernetes, Open Shift etc installations as you see fit. :)
+
+
+# License
+
+[Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)

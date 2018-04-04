@@ -2,6 +2,7 @@
 
 # compiled output
 /dist
+/build
 /dist-server
 /tmp
 /out-tsc
@@ -34,6 +35,9 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+*.map
+*.zip
+*.tar.gz
 
 # e2e
 /e2e/*.js
