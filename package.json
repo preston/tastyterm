@@ -7,12 +7,14 @@
   "author": "Preston Lee",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build --prod",
+    "start": "npm run env-setup && ng serve --environment=env",
+    "build": "npm run env-setup  && ng build --prod --environment=env",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "postinstall": "node pug-rule-insert.js"
+    "env-setup": "node -e \"require('./additional-build-steps').env()\"",
+    "pug-compile": "node -e \"require('./additional-build-steps').env()\"",
+    "postinstall": "npm run pug-compile"
   },
   "private": true,
   "dependencies": {

@@ -35,6 +35,7 @@ import {
 import { ActivatedRoute } from "@angular/router";
 import * as fs from 'fs';
 import { Parameters } from "../models/parameters";
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: "home",
@@ -76,6 +77,10 @@ export class HomeComponent implements OnInit {
 	this.processSmartLaunch();
 	// this.searchFilter = 'right';
 	// this.search();
+
+    // Showing how we can read environment specific config in the UI,
+    // that is generated at build time by Angular CLI.
+    console.log("OAUTH_CLIENT_ID", environment.TASTYTERM_OAUTH_CLIENT_ID);
   }
 
 

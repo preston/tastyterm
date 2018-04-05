@@ -32,11 +32,23 @@ Then, assuming you've already familiar with [Docker](https://www.docker.com) awe
 
 ## Production Deployment
 
-Extremely easy in your existing Dockerized hosting environment by pointing it at your TastyTerm installation. Just:
+This app respects the `NODE_ENV` environment variable when compiling the front-end. Be sure to set this appropriately. If not set, it defaults to `development`.
+
+Deployment is extremely easy in your existing Dockerized hosting environment by pointing it at your TastyTerm installation. Just:
 
 	docker run -d -p 4200:80 --restart unless-stopped p3000/tastyterm:latest # or any official tag
+	
+In order to use Smart on FHIR mode, you must set your OAuth Client ID in a system environment variable named `TASTYTERM_OAUTH_CLIENT_ID` like this:
 
-And you're done. No environment variables or further configuration are needed. Jedi's may use your existing Kubernetes, Open Shift etc installations as you see fit. :)
+On Windows:
+
+	cmd /C "set "TASTYTERM_OAUTH_CLIENT_ID=[your client id]" && set"
+
+On OSX/UNIX/LINUX:
+
+	export TASTYTERM_OAUTH_CLIENT_ID=[your client id]
+
+And you're done. Jedi's may use your existing Kubernetes, Open Shift etc installations as you see fit. :)
 
 
 # License

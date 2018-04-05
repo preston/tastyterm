@@ -7,6 +7,10 @@
 /tmp
 /out-tsc
 
+# Custom environment config we generate on each machine
+# so we don't want to track this file.
+/src/environments/evironment.ts
+
 # dependencies
 /node_modules
 

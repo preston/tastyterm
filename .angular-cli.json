@@ -19,16 +19,19 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "../node_modules/font-awesome/css/font-awesome.css",
         "../node_modules/bootstrap/dist/css/bootstrap.css",
         "../node_modules/angular2-toaster/toaster.css",
+        "../node_modules/font-awesome/css/font-awesome.css",
+        "app/stylesheets/main.sass",
+        "app/stylesheets/theme.sass",
+        "app/stylesheets/ribbons.sass",
         "styles.sass"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",
       "environments": {
-        "dev": "environments/environment.ts",
-        "prod": "environments/environment.prod.ts"
+        "env": "environments/environment.ts",
+        "dev": "environments/environment.ts"
       }
     }
   ],
