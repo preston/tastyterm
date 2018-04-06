@@ -78,7 +78,7 @@ module.exports.env = function environmentVariables() {
 
   // This is the environment config file that is normally static,
   // but we will be updating it each time the app is built.
-  const targetPath = './src/environments/environment.ts';
+  const targetPath = '/src/environments/environment.ts';
 
   // Check to make sure environment variables are actually
   // accessible before continuing this script.
@@ -114,14 +114,19 @@ module.exports.env = function environmentVariables() {
     };
   `;
 
+  // Create the environment directory in the project if it doesn't already exist.
+  let dirPath = path.join(__dirname, '/src/environments/');
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath);
+  }
   // Actually write the file and save it.
-  fs.writeFile(targetPath, envConfigFile, function (err) {
-
+  fs.writeFile(path.join(__dirname, targetPath), envConfigFile, function (err) {
     // Print to console if we have errors.
     if (err) {
+      // Some error. Tell the user.
       console.log(err);
     }
     // Otherwise, we are good!
-    console.log(`Output generated at ${targetPath}`);
+    console.log(`Success! environment.ts generated at ${targetPath}!`);
   });
 };
