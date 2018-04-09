@@ -1,11 +1,19 @@
 import { Component, Output, Inject, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
 
+import * as fs from 'fs';
+
+import { environment } from '../../environments/environment';
+
+// Models
+import { Parameters } from "../models/parameters";
 import { Bundle } from "../models/bundle";
 import { OperationOutcome } from "../models/operation_outcome";
 import { CodeSystem } from "../models/code_system";
 import { ConceptMap } from "../models/concept_map";
 import { ValueSet } from "../models/value_set";
 import { AuditEvent } from "../models/audit_event";
+import { AuthEvent, AuthEventType } from "../models/auth_event";
 
 import {
   ToasterModule,
@@ -22,6 +30,7 @@ import { QuickTermService } from "../services/tastyterm.service";
 import { CodeSystemService } from "../services/code_system.service";
 import { ValueSetService } from "../services/value_set.service";
 import { ConceptMapService } from "../services/concept_map.service";
+import { AuthenticationService } from '../services/authentication.service';
 
 // import {XmlExporterCodeSystem} from '../codeSystems/xml_exporter.service';
 
@@ -32,10 +41,6 @@ import {
   Headers
 } from "@angular/http";
 
-import { ActivatedRoute } from "@angular/router";
-import * as fs from 'fs';
-import { Parameters } from "../models/parameters";
-import { environment } from '../../environments/environment';
 
 @Component({
   selector: "home",
@@ -63,6 +68,7 @@ export class HomeComponent implements OnInit {
 
 
   constructor(
+    private authenticationService: AuthenticationService,
     private quickTermService: QuickTermService,
     private codeSystemService: CodeSystemService,
     private valueSetService: ValueSetService,
@@ -71,12 +77,16 @@ export class HomeComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private http: Http,
     @Inject("Window") private window: Window
-  ) {}
+  ) {
+    authenticationService.authEvents$.subscribe({
+      next: (authEvent:AuthEvent) => this.handleAuthEvent(authEvent)
+    });
+  }
 
   ngOnInit() {
-	this.processSmartLaunch();
-	// this.searchFilter = 'right';
-	// this.search();
+    this.processSmartLaunch();
+    // this.searchFilter = 'right';
+    // this.search();
 
     // Showing how we can read environment specific config in the UI,
     // that is generated at build time by Angular CLI.
@@ -99,43 +109,7 @@ export class HomeComponent implements OnInit {
       let state: string = params["state"];
       if (code && state) {
         // We should be receiving an authenticated launch!
-        // Load our OAuth parameters stored in the session.
-        let tmp = JSON.parse(localStorage[state]);
-        this.quickTermService.url = tmp.serviceUri;
-
-        let tokenUri = tmp.tokenUri;
-        let clientId = tmp.clientId;
-        let secret = tmp.secret;
-        let redirectUri = tmp.redirectUri;
-
-        // Prep the token exchange call parameters
-        let body =
-          "grant_type=authorization_code" +
-          "&code=" +
-          code +
-          "&redirect_uri=" +
-          encodeURI(redirectUri) +
-          "&client_id=" +
-          clientId;
-        let opts = new RequestOptions();
-        opts.headers = new Headers();
-        opts.headers.append(
-          "Content-Type",
-          "application/x-www-form-urlencoded"
-        );
-        this.http
-          .post(tokenUri, body, opts)
-          .map(resp => resp.json())
-          .subscribe(resp => {
-            // should get back the access token and the patient ID
-            let accessToken = resp["access_token"];
-            let patientId = resp["patient"];
-            localStorage.setItem(
-              QuickTermService.STORAGE_BEARER_TOKEN_KEY,
-              accessToken
-            );
-            this.reloadCodeSystems();
-          });
+        this.authenticationService.getToken(code, state);
       } else {
         // We're starting in standalone mode, and need a fallback server.
         // Just a reasonable default! This is overriden on SMART launch.
@@ -260,8 +234,19 @@ export class HomeComponent implements OnInit {
     return this.searchFilter.length > 2;
   }
 
+  handleAuthEvent(authEvent: AuthEvent){
+    switch(authEvent.type){
+      case AuthEventType.LOGOUT:
+        console.log("LOGOUT event fired.");
+        this.logout();
+        break;
+      case AuthEventType.TOKEN_ACQUIRED:
+        console.log("TOKEN_ACQUIRED event fired.");
+        this.reloadCodeSystems();
+        break;
+    }
+  }
   logout() {
-    localStorage.removeItem(QuickTermService.STORAGE_BEARER_TOKEN_KEY);
     // this.quickTermService.logout().subscribe(d => {
     this.reloadCodeSystems();
     // 	console.log("Logout complete.");

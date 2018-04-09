@@ -23,6 +23,7 @@ import { ConceptMapComponent } from './components/concept_map.component';
 import { CodeVisualizerComponent } from './components/code_visualizer.component';
 
 // Services
+import { AuthenticationService } from './services/authentication.service';
 import { QuickTermService } from './services/tastyterm.service';
 import { CodeSystemService } from './services/code_system.service';
 import { ValueSetService } from './services/value_set.service';
@@ -56,6 +57,7 @@ const routing = RouterModule.forRoot(
     NgxGraphModule
   ],
   providers: [
+    AuthenticationService,
     CodeSystemService,
     QuickTermService,
     ConceptMapService,
