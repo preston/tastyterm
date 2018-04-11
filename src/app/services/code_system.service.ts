@@ -8,7 +8,7 @@ import { BaseService } from "./base.service";
 import { QuickTermService } from './tastyterm.service';
 
 import { Bundle } from "../models/bundle";
-import { Parameters } from "../models/parameters";
+import { Parameter } from "../models/parameter";
 import { CodeSystem } from "../models/code_system";
 import { ValueSet } from "../models/value_set";
 
@@ -34,14 +34,14 @@ export class CodeSystemService extends BaseService {
   }
 
   // Gets details of a specific code.
-  lookup(codeSystem: CodeSystem, code: string): Observable<Parameters> {
+  lookup(codeSystem: CodeSystem, code: string): Observable<Parameter[]> {
     let opts = this.options();
     opts.params = opts.params.append('code', code);
     opts.params = opts.params.append('system', codeSystem.url);
     opts.params = opts.params.append('version', codeSystem.version);
 
     let obs = this.http.get(this.url() + CodeSystemService.LOOKUP, opts).map((res) => {
-      return <Parameters> res;
+      return <Parameter[]> res;
     });
     return obs;
   }

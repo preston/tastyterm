@@ -182,7 +182,7 @@ export class HomeComponent implements OnInit {
       this.codeSystemService
         .lookup(this.codeSystem, vs.code)
         .subscribe(params => {
-          this.valueSetParameters = params;
+          this.valueSetParameters = new Parameters(params);
           // this.valueSetParameters.unpack();
           console.log("ValueSet Parameters:");
           console.log(this.valueSetParameters);

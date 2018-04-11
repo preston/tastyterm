@@ -381,29 +381,24 @@ export class CodeVisualizerComponent implements OnInit {
       console.log("Updating visualization...");
       this.hierarchicalGraph.reset();
       let vs = this.valueSet;
-      let vsp = <any> this.valueSetParameters;
+      let vsp = this.valueSetParameters;
       let center = new Node(vs.code, vs.code);
       this.hierarchicalGraph.nodes.push(center);
       if (vs && vsp) {
-        for (let p of vsp.parameter) {
-          if(p.name === 'property'){
-            let label: string;
-            switch (p.part[0].valueCode) {
-              case "parent":
-                label = p.part[1].valueCode;
-                let parent = new Node(label, label);
-                this.hierarchicalGraph.nodes.push(parent);
-                let pLink = new Link(center.id, parent.id, "parent");
-                this.hierarchicalGraph.links.push(pLink);
-                break;
-              case "child":
-                label = p.part[1].valueCode;
-                let child = new Node(label, label);
-                this.hierarchicalGraph.nodes.push(child);
-                let cLink = new Link(child.id, center.id, "child");
-                this.hierarchicalGraph.links.push(cLink);
-                break;
-            }
+        for (let p of vsp.properties) {
+          switch (p["code"]) {
+            case "parent":
+              let parent = new Node(p["value"], p["value"]);
+              this.hierarchicalGraph.nodes.push(parent);
+              let pLink = new Link(center.id, parent.id, "parent");
+              this.hierarchicalGraph.links.push(pLink);
+              break;
+            case "child":
+              let child = new Node(p["value"], p["value"]);
+              this.hierarchicalGraph.nodes.push(child);
+              let cLink = new Link(child.id, center.id, "child");
+              this.hierarchicalGraph.links.push(cLink);
+              break;
           }
         }
       }
