@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Http } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 import 'rxjs/add/operator/map';
 import { Observable } from 'rxjs/Observable';
 
@@ -18,7 +18,7 @@ export class ConceptMapService extends BaseService {
 	public static PATH: string = '/ConceptMap';
 	public static TRANSLATE: string = '/$translate';
 
-	constructor(quicktermService: QuickTermService, http: Http) {
+	constructor(quicktermService: QuickTermService, http: HttpClient) {
 		super(quicktermService, http);
 	}
 
@@ -27,7 +27,9 @@ export class ConceptMapService extends BaseService {
 	}
 
 	bundle(): Observable<Bundle<ConceptMap>> {
-		let obs = this.http.get(ConceptMapService.PATH, this.options()).map(res => res.json());
+		let obs = this.http.get(ConceptMapService.PATH, this.options()).map((res) => {
+      return <Bundle<ConceptMap>> res;
+    });
 		return obs;
 	}
 
@@ -39,12 +41,14 @@ export class ConceptMapService extends BaseService {
 		// url:http://snomed.info/sct?fhir_cm=11000168105
 		// version:http://snomed.info/sct/32506021000036107/version/20180131
 		let opts = this.options();
-		opts.params.append('code', code);
-		opts.params.append('system', codeSystem.url);
-		opts.params.append('version', codeSystem.version);
-		opts.params.append('source', codeSystem.valueSet);
+    opts.params = opts.params.append('code', code);
+    opts.params = opts.params.append('system', codeSystem.url);
+    opts.params = opts.params.append('version', codeSystem.version);
+    opts.params = opts.params.append('source', codeSystem.valueSet);
 
-		let obs = this.http.get(this.url() + ConceptMapService.TRANSLATE, opts).map(res => new Parameters(res.json()));
+		let obs = this.http.get(this.url() + ConceptMapService.TRANSLATE, opts).map((res) => {
+		  return <Parameters> res
+    });
 		return obs;
 		// let conceptMaps = this.http.get(this.url(service), this.options()).map(res => res.json());
 		// return conceptMaps;

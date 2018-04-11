@@ -1,6 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Headers, RequestOptions } from '@angular/http';
-import { Http } from '@angular/http';
+import {HttpHeaders, HttpClient, HttpParams} from '@angular/common/http';
 import 'rxjs/add/operator/map';
 
 
@@ -13,18 +12,18 @@ export class QuickTermService {
   // public static JWT_LAUNCH_KEY: string = 'jwt';
   public static STORAGE_BEARER_TOKEN_KEY: string = 'token';
 
-  constructor(protected http: Http) {
+  constructor(protected http: HttpClient) {
   }
 
-  public requestOptions(includeBearerToken: boolean): RequestOptions {
-    let headers = new Headers({ 'Accept': 'application/json' });
+  public requestOptions(includeBearerToken: boolean) {
+    let headers = new HttpHeaders({ 'Accept': 'application/json' });
     if (includeBearerToken) {
       headers.append('Authorization', 'Bearer ' + localStorage.getItem(QuickTermService.STORAGE_BEARER_TOKEN_KEY));
       headers.append('Accept', 'Accept: application/json+fhir');
     }
-    let params = new URLSearchParams();
+    let params = new HttpParams();
     // return new RequestOptions({ headers: headers, withCredentials: true, params: params });
-    return new RequestOptions({ headers: headers, withCredentials: false, params: params });
+    return { headers: headers, withCredentials: false, params: params };
   }
 
 

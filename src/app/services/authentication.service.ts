@@ -11,11 +11,10 @@ import 'rxjs/add/operator/map';
 
 // Services
 import {QuickTermService} from "./tastyterm.service";
-import {Headers, RequestOptions} from "@angular/http";
 
 // Models
 import { AuthEvent, AuthEventType } from "../models/auth_event";
-import {Observable} from "rxjs/Observable";
+import { Observable } from "rxjs/Observable";
 
 @Injectable()
 export class AuthenticationService {
