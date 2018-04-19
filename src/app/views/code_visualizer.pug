@@ -1,17 +1,4 @@
 //- h1 Visualizer
 //- div(style="position: absolute; top: 50px; left: 50px; right: 50px; bottom: 50px;")
 #visualization-container(style="width: 100%")
-	ngx-graph.chart-container("[class]"="theme" "autoZoom"="true" "[view]"="view" "[legend]"="showLegend" "[links]"="hierarchicalGraph.links" "(legendlabelclick)"="onLegendLabelClick($event)" "[nodes]"="hierarchicalGraph.nodes" "[scheme]"="colorScheme" "[orientation]"="orientation" "[curve]"="interpolationCurve" "(select)"="select($event)")
-		ng-template(#defsTemplate="")
-			svg:marker#arrow(viewbox="0 -5 10 10" refx="8" refy="0" markerwidth="4" markerheight="4" orient="auto")
-				svg:path.arrow-head(d="M0,-5L10,0L0,5")
-		ng-template(#nodeTemplate="" let-node="")
-			svg:g.node(ngx-tooltip="" [tooltipplacement]="'top'" [tooltiptype]="'tooltip'" [tooltiptitle]="node.label")
-				svg:rect("[attr.width]"="node.width" "[attr.height]"="node.height" "[attr.fill]"="node.options.color")
-				svg:text("alignment-baseline"="central" "[attr.x]"="10" "[attr.y]"="node.height / 2") {{node.label}}
-		ng-template(#linkTemplate="" let-link="")
-			svg:g.edge
-				svg:path.line(stroke-width="2" marker-end="url(#arrow)")
-				svg:text.edge-label(text-anchor="middle")
-					textpath.text-path("[attr.href]"="'#' + link.id" "[style.dominant-baseline]"="link.dominantBaseline" startoffset="50%")
-						| {{link.label}}
+  directed-graph('[links]'='hierarchicalGraph.links','[nodes]'='hierarchicalGraph.nodes','(onNodeClicked)'='select($event)')

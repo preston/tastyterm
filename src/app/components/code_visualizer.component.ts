@@ -4,7 +4,9 @@ import {
   ViewEncapsulation,
   ElementRef,
   HostListener,
+  EventEmitter,
   Input,
+  Output,
   SimpleChanges
 } from "@angular/core";
 
@@ -21,6 +23,8 @@ import { Link } from "../models/link";
   templateUrl: "../views/code_visualizer.pug"
 })
 export class CodeVisualizerComponent implements OnInit {
+  @Output() onSelection = new EventEmitter<Node>();
+
   theme: string = "dark";
   chartType: string = "directed-graph";
   chartGroups = [
@@ -409,7 +413,6 @@ export class CodeVisualizerComponent implements OnInit {
 
   selectChart(chartSelector) {
     this.chartType = chartSelector;
-
     for (const group of this.chartGroups) {
       for (const chart of group.charts) {
         if (chart.selector === chartSelector) {
@@ -422,6 +425,7 @@ export class CodeVisualizerComponent implements OnInit {
 
   select(data) {
     console.log("Item clicked", data);
+    this.onSelection.emit(data);
   }
 
   onLegendLabelClick(entry) {

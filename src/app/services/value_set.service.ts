@@ -45,6 +45,15 @@ export class ValueSetService extends BaseService {
         return <ValueSet> res;
       });
     }
+    getValueSetByCode(codeSystem: CodeSystem, code: string): Observable<ValueSet> {
+      let opts = this.options();
+      opts.params = opts.params.append('code', code);
+      opts.params = opts.params.append('system', codeSystem.url);
+      opts.params = opts.params.append('version', codeSystem.version);
+      return this.http.get(this.url() + '/' + ValueSetService.EXPAND, opts).map((res) => {
+        return <ValueSet> res;
+      });
+    }
 
     // get(id: string) {
     //     let platform = this.http.get(this.url() + '/' + id, this.options()).map(res => res.json());

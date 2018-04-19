@@ -90,7 +90,7 @@ include layout/navigation
                     h1 {{valueSetParameters.display}}
                     | From {{valueSetParameters.name}} ({{valueSetParameters.version}})
                     hr
-                code-visualizer("[valueSet]"="valueSet" "[valueSetParameters]"="valueSetParameters")
+                code-visualizer("[valueSet]"="valueSet" "[valueSetParameters]"="valueSetParameters", '(onSelection)'='nodeClicked($event)')
 
                 .row
                     section.col-sm-5

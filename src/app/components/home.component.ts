@@ -201,6 +201,14 @@ export class HomeComponent implements OnInit {
     console.log(this.codeSystem);
   }
 
+  nodeClicked(node) {
+    this.valueSetService
+      .expand(this.codeSystem, node.id, this.resultLimit)
+      .subscribe(d => {
+        let expansionResult = this.checkExpansion(d);
+        expansionResult ? this.selectValueSet(expansionResult) : null;
+      });
+  }
   search() {
     if (this.validSearch()) {
       this.searching = true;
@@ -208,25 +216,32 @@ export class HomeComponent implements OnInit {
       this.valueSetService
         .expand(this.codeSystem, this.searchFilter, this.resultLimit)
         .subscribe(d => {
-          this.results = d;
-          this.searching = false;
-          console.log("Search results:");
-          console.log(d);
-          // TypeScript really needs safe navigation. :(
-          if (
-            this.results.expansion &&
-            this.results.expansion["contains"] &&
-            this.results.expansion["contains"].length > 0
-          ) {
-            this.selectValueSet(this.results.expansion["contains"][0]);
-            // console.log("Setting default ValueSet selection to:");
-            // console.log(this.valueSet);
-          }
+          let expansionResult = this.checkExpansion(d);
+          expansionResult ? this.selectValueSet(expansionResult) : null;
         });
     } else {
       console.log("Invalid search ignored.");
       this.results = null;
       // this.loadInitialCodeSystems();
+    }
+  }
+
+  checkExpansion(results){
+    this.results = results;
+    this.searching = false;
+    console.log("Search results:");
+    console.log(results);
+    // TypeScript really needs safe navigation. :(
+    if (
+      this.results.expansion &&
+      this.results.expansion["contains"] &&
+      this.results.expansion["contains"].length > 0
+    ) {
+      // console.log("Setting default ValueSet selection to:");
+      // console.log(this.valueSet);
+      return this.results.expansion["contains"][0];
+    } else {
+      return false;
     }
   }
 

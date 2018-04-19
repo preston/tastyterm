@@ -21,6 +21,7 @@ import { ApiComponent } from './components/api.component';
 import { CodeSystemComponent } from './components/code_system.component';
 import { ConceptMapComponent } from './components/concept_map.component';
 import { CodeVisualizerComponent } from './components/code_visualizer.component';
+import { DirectedGraphComponent } from './components/directed_graph.component';
 
 // Services
 import { AuthenticationService } from './services/authentication.service';
@@ -43,7 +44,8 @@ const routing = RouterModule.forRoot(
     ApiComponent,
     HomeComponent,
     CodeSystemComponent,
-    CodeVisualizerComponent
+    CodeVisualizerComponent,
+    DirectedGraphComponent
   ],
   imports: [
     BrowserModule,
