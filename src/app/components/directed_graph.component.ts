@@ -145,13 +145,6 @@ export class DirectedGraphComponent implements OnInit {
               target.y = d.target.y;
               return d.target.y;
             });
-          svg.selectAll('#arrow')
-            .attr('refX', () => {
-              // Find distance between the two point with pythagorean's theorem
-              let a = source.x - target.x;
-              let b = source.y - target.y;
-              return Math.sqrt( a*a + b*b )
-            });
           svg.selectAll('circle')
             .attr('cx', (d: any) => { return d.x; })
             .attr('cy', (d: any) => { return d.y; });
