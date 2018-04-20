@@ -33,6 +33,7 @@ import { ConceptMapService } from './services/concept_map.service';
 const routing = RouterModule.forRoot(
   [
     { path: '', component: HomeComponent },
+    { path: 'term/:termId', component: HomeComponent },
     { path: 'api', component: ApiComponent }
   ],
   { enableTracing: true } // <-- debugging purposes only

@@ -84,69 +84,92 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.processSmartLaunch();
+    this.processSmartLaunch().then((promiseResponse) => {
+      // Showing how we can read environment specific config in the UI,
+      // that is generated at build time by Angular CLI.
+      console.log("OAUTH_CLIENT_ID", environment.TASTYTERM_OAUTH_CLIENT_ID);
+      // Subscribe to query parameters that let us link to specific terms
+      this.activatedRoute.params.subscribe((params) => {
+        this.valueSetService
+          .expand(this.codeSystem, params["termId"], this.resultLimit)
+          .subscribe(d => {
+            let expansionResult = this.checkExpansion(d);
+            expansionResult ? this.selectValueSet(expansionResult) : null;
+          });
+      });
+    }).catch(((err) => {
+      console.info('ngOnInit Error: ', console.log(err))
+    }));
     // this.searchFilter = 'right';
     // this.search();
-
-    // Showing how we can read environment specific config in the UI,
-    // that is generated at build time by Angular CLI.
-    console.log("OAUTH_CLIENT_ID", environment.TASTYTERM_OAUTH_CLIENT_ID);
   }
-
 
   getLimits() {
     return HomeComponent.LIMITS;
   }
 
-  processSmartLaunch(): void {
-    console.log("Checking for FHIR launch.");
-    this.activatedRoute.queryParams.subscribe(params => {
-      // for (let p in params) {
-      // 	console.log(p);
-      // }
+  processSmartLaunch(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
       console.log("Checking for FHIR launch.");
-      let code: string = params["code"];
-      let state: string = params["state"];
-      if (code && state) {
-        // We should be receiving an authenticated launch!
-        this.authenticationService.getToken(code, state);
-      } else {
-        // We're starting in standalone mode, and need a fallback server.
-        // Just a reasonable default! This is overriden on SMART launch.
-        this.quickTermService.url = HomeComponent.FALLBACK_SERVER;
-        this.reloadCodeSystems();
-      }
+      this.activatedRoute.queryParams.subscribe(params => {
+        // for (let p in params) {
+        // 	console.log(p);
+        // }
+        console.log("Checking for FHIR launch.");
+        let code: string = params["code"];
+        let state: string = params["state"];
+        if (code && state) {
+          // We should be receiving an authenticated launch!
+          this.authenticationService.getToken(code, state);
+          resolve(true);
+        } else {
+          // We're starting in standalone mode, and need a fallback server.
+          // Just a reasonable default! This is overriden on SMART launch.
+          this.quickTermService.url = HomeComponent.FALLBACK_SERVER;
+          this.reloadCodeSystems().then((promiseResponse) => {
+            resolve(true);
+          }).catch((err) => {
+            console.info("Loading codesystems failed...", err);
+            reject(false)
+          });
+        }
+      });
     });
   }
 
-  reloadCodeSystems() {
-    this.codeSystemBundle = null;
-    this.codeSystems = null;
-    this.codeSystemService.bundle().subscribe(d => {
-      this.codeSystemBundle = d;
-      if (d.total > 0) {
-        this.codeSystems = d.entry.map(r => r["resource"]);
-        console.log("CodeSystem entries: " + this.codeSystems.length);
-        if (this.codeSystems.length > 0) {
-          this.codeSystem = this.codeSystems[0];
-          this.codeSystemChanged();
+  reloadCodeSystems(): Promise <string> {
+    return new Promise((resolve, reject) => {
+      this.codeSystemBundle = null;
+      this.codeSystems = null;
+      this.codeSystemService.bundle().subscribe(d => {
+        this.codeSystemBundle = d;
+        if (d.total > 0) {
+          this.codeSystems = d.entry.map(r => r["resource"]);
+          console.log("CodeSystem entries: " + this.codeSystems.length);
+          if (this.codeSystems.length > 0) {
+            this.codeSystem = this.codeSystems[0];
+            this.codeSystemChanged();
+            this.toasterService.pop(
+              "success",
+              "Welcome!",
+              this.codeSystems.length + " code systems are available."
+            );
+            resolve('Done');
+          }
+        } else {
+          console.log("Server doesn't have any CodeSystem resources!");
+          let errorMessage = 'It appears the server either doesn\'t support code system resources, or doesn\'t have any.';
           this.toasterService.pop(
-            "success",
-            "Welcome!",
-            this.codeSystems.length + " code systems are available."
+            "warning",
+            "We need to talk..",
+            errorMessage
           );
+          this.codeSystems = [];
+          reject(errorMessage);
         }
-      } else {
-        console.log("Server doesn't have any CodeSystem resources!");
-        this.toasterService.pop(
-          "warning",
-          "We need to talk..",
-          "It appears the server either doesn't support code system resources, or doesn't have any."
-        );
-        this.codeSystems = [];
-      }
+      });
+      this.search();
     });
-    this.search();
   }
 
   codeSystemChanged(): void {
