@@ -90,12 +90,14 @@ export class HomeComponent implements OnInit {
       console.log("OAUTH_CLIENT_ID", environment.TASTYTERM_OAUTH_CLIENT_ID);
       // Subscribe to query parameters that let us link to specific terms
       this.activatedRoute.params.subscribe((params) => {
-        this.valueSetService
-          .expand(this.codeSystem, params["termId"], this.resultLimit)
-          .subscribe(d => {
-            let expansionResult = this.checkExpansion(d);
-            expansionResult ? this.selectValueSet(expansionResult) : null;
-          });
+        if(params["termId"]){
+          this.valueSetService
+            .expand(this.codeSystem, params["termId"], this.resultLimit)
+            .subscribe(d => {
+              let expansionResult = this.checkExpansion(d);
+              expansionResult ? this.selectValueSet(expansionResult) : null;
+            });
+        }
       });
     }).catch(((err) => {
       console.info('ngOnInit Error: ', console.log(err))
