@@ -1,10 +1,9 @@
 // Core Modules
 import { BrowserModule } from '@angular/platform-browser';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {HttpClientModule} from '@angular/common/http';
-import {HttpModule} from '@angular/http';
+import { HttpClientModule} from '@angular/common/http';
 
 // Routing
 import { Routes, RouterModule } from '@angular/router';
@@ -30,6 +29,9 @@ import { CodeSystemService } from './services/code_system.service';
 import { ValueSetService } from './services/value_set.service';
 import { ConceptMapService } from './services/concept_map.service';
 
+// App modules
+import { MaterialModule } from './material.module';
+
 const routing = RouterModule.forRoot(
   [
     { path: '', component: HomeComponent },
@@ -50,11 +52,11 @@ const routing = RouterModule.forRoot(
   ],
   imports: [
     BrowserModule,
-    routing,
-    FormsModule,
-    HttpModule,
-    HttpClientModule,
     BrowserAnimationsModule, // For Toaster
+    routing,
+    MaterialModule,
+    FormsModule,
+    HttpClientModule,
     ToasterModule,
     CarouselModule,
     NgxGraphModule
