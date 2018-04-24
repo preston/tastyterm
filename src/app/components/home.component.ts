@@ -1,5 +1,8 @@
-import { Component, Output, Inject, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import {Component, Output, Inject, OnInit, ViewChild} from "@angular/core";
+import { Router, ActivatedRoute } from "@angular/router";
+import { FormControl } from "@angular/forms";
+
+import { Observable } from "rxjs/Observable";
 
 import * as fs from 'fs';
 
@@ -20,34 +23,32 @@ import {
   ToasterService
 } from "angular2-toaster/angular2-toaster";
 
-import {
-  SlideComponent,
-  CarouselComponent,
-  CarouselModule
-} from "ngx-bootstrap";
-
 import { QuickTermService } from "../services/tastyterm.service";
 import { CodeSystemService } from "../services/code_system.service";
 import { ValueSetService } from "../services/value_set.service";
 import { ConceptMapService } from "../services/concept_map.service";
 import { AuthenticationService } from '../services/authentication.service';
+import {startWith} from "rxjs/operator/startWith";
+import {map} from "rxjs/operator/map";
+import "rxjs/add/operator/distinctUntilChanged";
+import "rxjs/add/operator/filter";
+import "rxjs/add/operator/do";
+import "rxjs/add/operator/debounceTime";
+import {MatAutocompleteSelectedEvent} from "@angular/material";
 
 // import {XmlExporterCodeSystem} from '../codeSystems/xml_exporter.service';
-
-import {
-  Http,
-  RequestOptions,
-  RequestOptionsArgs,
-  Headers
-} from "@angular/http";
 
 
 @Component({
   selector: "home",
   templateUrl: "../views/home.pug",
-  providers: [CarouselModule]
+  providers: []
 })
 export class HomeComponent implements OnInit {
+  @ViewChild("codesearch") codesearch: FormControl;
+  codeSearchInput: FormControl = new FormControl();
+  codeSearchString: string = "";
+  searchResults: any[] = [];
   // The currently selected service, if any.
   codeSystem: CodeSystem;
   codeSystemBundle: Bundle<CodeSystem>;
@@ -61,7 +62,8 @@ export class HomeComponent implements OnInit {
   results: ValueSet = null;
   resultLimit: number = HomeComponent.LIMITS[0];
   searching: boolean = false; // Used for visually indicating when a search is in progress.
-
+  propertyTableHeader: string[] = ['code','value'];
+  designationTableHeader: string[] = ['value', 'use', 'language'];
   public static LIMITS: Array<number> = [10, 50, 100];
   // status: Object;
   public static FALLBACK_SERVER: string = "https://ontoserver.hspconsortium.org/fhir";
@@ -75,7 +77,7 @@ export class HomeComponent implements OnInit {
     private conceptMapService: ConceptMapService,
     private toasterService: ToasterService,
     private activatedRoute: ActivatedRoute,
-    private http: Http,
+    private router: Router,
     @Inject("Window") private window: Window
   ) {
     authenticationService.authEvents$.subscribe({
@@ -91,12 +93,7 @@ export class HomeComponent implements OnInit {
       // Subscribe to query parameters that let us link to specific terms
       this.activatedRoute.params.subscribe((params) => {
         if(params["termId"]){
-          this.valueSetService
-            .expand(this.codeSystem, params["termId"], this.resultLimit)
-            .subscribe(d => {
-              let expansionResult = this.checkExpansion(d);
-              expansionResult ? this.selectValueSet(expansionResult) : null;
-            });
+          this.selectAsValueSet(params["termId"]);
         }
       });
     }).catch(((err) => {
@@ -104,6 +101,30 @@ export class HomeComponent implements OnInit {
     }));
     // this.searchFilter = 'right';
     // this.search();
+  }
+
+  ngAfterViewInit(){
+    this.codeSearchInput.valueChanges
+      .distinctUntilChanged()
+      .filter(val => val)
+      .filter((val) => {
+        if(val != '' && val.length > 2){
+          return true;
+        } else {
+          this.searchResults = null;
+          return false;
+        }
+      })
+      .debounceTime(300)
+      .subscribe((searchString) => {
+        this.valueSetService
+          .expand(this.codeSystem, searchString, this.resultLimit)
+          .subscribe(d => {
+            if(d.expansion["contains"]){
+              this.searchResults = d.expansion["contains"];
+            }
+          });
+      });
   }
 
   getLimits() {
@@ -227,23 +248,36 @@ export class HomeComponent implements OnInit {
   }
 
   nodeClicked(node) {
+    this.router.navigate(['/term/' + node.id]);
+  }
+
+  selectAsValueSet(incomingValue) {
     this.valueSetService
-      .expand(this.codeSystem, node.id, this.resultLimit)
+      .expand(this.codeSystem, incomingValue, this.resultLimit)
       .subscribe(d => {
         let expansionResult = this.checkExpansion(d);
         expansionResult ? this.selectValueSet(expansionResult) : null;
+        this.codeSearchInput.setValue(expansionResult.display);
       });
   }
+
+  resultSelected(selectEvent: MatAutocompleteSelectedEvent){
+    if (selectEvent){
+      this.router.navigate(['/term/' + selectEvent.option.value.code]);
+    }
+  }
+
+  codeSearchInputDisplay(option): string {
+    if (option){
+      return option.display ? option.display : option;
+    }
+  }
+
   search() {
     if (this.validSearch()) {
       this.searching = true;
       this.valueSet = null;
-      this.valueSetService
-        .expand(this.codeSystem, this.searchFilter, this.resultLimit)
-        .subscribe(d => {
-          let expansionResult = this.checkExpansion(d);
-          expansionResult ? this.selectValueSet(expansionResult) : null;
-        });
+      this.selectAsValueSet(this.searchFilter);
     } else {
       console.log("Invalid search ignored.");
       this.results = null;

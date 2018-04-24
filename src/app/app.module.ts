@@ -11,7 +11,6 @@ import { Routes, RouterModule } from '@angular/router';
 // Third Party
 import { ToasterModule, ToasterService } from 'angular2-toaster/angular2-toaster';
 import { NgxGraphModule } from "@swimlane/ngx-graph";
-import { CarouselModule } from 'ngx-bootstrap';
 
 // Components
 import { AppComponent } from './app.component';
@@ -58,7 +57,6 @@ const routing = RouterModule.forRoot(
     FormsModule,
     HttpClientModule,
     ToasterModule,
-    CarouselModule,
     NgxGraphModule
   ],
   providers: [

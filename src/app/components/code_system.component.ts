@@ -5,7 +5,6 @@ import {UUID} from 'angular2-uuid';
 
 import {ToasterModule, ToasterService} from 'angular2-toaster/angular2-toaster';
 
-import {SlideComponent, CarouselComponent, CarouselModule} from 'ngx-bootstrap';
 
 import {CodeSystem} from '../models/code_system';
 

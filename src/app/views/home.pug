@@ -1,183 +1,133 @@
 include layout/navigation
-.corner-ribbon.bottom-right.sticky.shadow Beta
-//- button.btn.btn-default.pull-right("*ngIf"="status.permissions?.everything?.manage" "[routerLink]"="['/system']")
-    span.fa.fa-cogs
-    //- |  System&nbsp;
 
-//- .jumbotron(*ngIf="!codeSystems")
-    //- h1 Loading this things.
-.container-fluid#home
-    .row
-        .col-sm-6
-          h1
-            | TastyTerm
-            small  :: smart-on-fhir terminology
-        .col-md-6
-            small.pull-right
-                | using:
-                a('[href]'='quickTermService.url' target="_blank") {{quickTermService.url}}
-    .row(*ngIf="codeSystems && codeSystems.length == 0")
-        .col-md-10.offset-md-1.jumbotron
-            h1 Bummer
-            .lead This FHIR server doesn't have any CodeSystem resources. Lame!
-    .row(*ngIf="codeSystems && codeSystems.length > 0")
-        form.form.col-md-8
-            .form-group
-                .input-group
-                    //- label(for='code_system_select') Code System&nbsp;
-                    .input-group-prepend
-                        i.input-group-text.fa.fa-globe
-                    select.form-control#code_system_select(name="code_system_select" "[(ngModel)]"="codeSystem" "(change)"="codeSystemChanged()")
-                        option("*ngFor"="let cs of codeSystems" "[ngValue]"="cs") {{cs.name}} ({{cs.version}})
+div.home-container('fxLayout'='column')
+  mat-card
+    div('fxFlex')
+      mat-form-field
+        mat-select#code_system_select("name"="code_system_select", "placeholder"="Code System", "[(ngModel)]"="codeSystem", "(change)"="codeSystemChanged()")
+          mat-option("*ngFor"="let cs of codeSystems", "[value]"="cs") {{cs.name}} ({{cs.version}}
+    div('fxFlex')
+      div('fxLayout'='row')
+        div('fxFlex'="90")
+          mat-form-field.autocomplete-custom-width
+            //input('matInput'="" width="100%" autofocus="true" type="search" "[(ngModel)]"='searchFilter' name="search_text" "(keyup)"="search()" placeholder="Search by name, code, or ID...")
+            //button('mat-button'="" type='submit' "[disabled]"="!validSearch()" "(click)"="search()")
+            //  span.fa.fa-search
+            //  |  Search
+            input('matInput'="", placeholder="Search for a term by code, name, or ID...", aria-label="Code Search", '[formControl]'="codeSearchInput", '[matAutocomplete]'="auto", '[(ngModel)]'="codeSearchString", name="auto" required)
+            mat-autocomplete('#auto'="matAutocomplete", '(optionSelected)'="resultSelected($event)", '[displayWith]'="codeSearchInputDisplay")
+              mat-option('*ngFor'="let option of searchResults", '[value]'="option") {{ option.display }} - {{option.code}}
+        div('fxFlex'="10")
+          mat-form-field
+            mat-select#result_limit("name"='result_limit', "[(ngModel)]"="resultLimit", "placeholder"="Limit Results To")
+              mat-option("*ngFor"="let l of getLimits()", "[value]"="l") {{l}}
 
-        form.form.col-md-2
-            .form-group
-                .input-group
-                    .input-group-prepend
-                        i.input-group-text.fa.fa-list-ol
-                    select.form-control#result_limit(name='result_limit' "[(ngModel)]"="resultLimit")
-                        option("*ngFor"="let l of getLimits()" "[ngValue]"="l") {{l}}
-                    //- label(for="result_limit") &nbsp;results
-        form.form.col-md-2
-            //- .form-group
-            a.btn.btn-default(role="button" data-toggle="collapse" data-target="#code_system_details")
-                        u details
+// For when a search has been completed, but there are zero results.
+div.home-container('fxLayout'='column', '*ngIf'="results && results.expansion?.contains == null")
+  div('fxFlex')
+    mat-card No results!
 
-        form.form.col-sm-8("*ngIf"="codeSystem")
-            //- hr
-            .form-group
-                .input-group
-                    .input-group-prepend
-                        i.input-group-text.fa.fa-search
-                    input.form-control.form-control(autofocus="true" type="search" "[(ngModel)]"='searchFilter' name="search_text" "(keyup)"="search()" placeholder="")
-                    //- span.input-group-btn
-                        button.btn.btn-primary(type='submit' "[disabled]"="!validSearch()" "(click)"="search()")
-                            span.fa.fa-search
-                            |  Search
-        form.form.col-sm-2
-            .form-group
-                    span
-                        i.fa.fa-spinner.fa-spin.fa-2x(*ngIf="searching")
-    .row
-        //- For when a search has been completed, but there are zero results.
-        div.col-md-10.offset-md-1(*ngIf="results && results.expansion?.contains == null")
-            .text-center
-                i.text-default No results!
+div.home-container('fxLayout'='column', "*ngIf"="results && results.expansion?.contains")
+    div('fxFlex', "*ngIf"="valueSet && valueSetParameters")
+      code-visualizer("[valueSet]"="valueSet" "[valueSetParameters]"="valueSetParameters", '(onSelection)'='nodeClicked($event)')
+div.home-container('*ngIf'="valueSetParameters")
+  mat-card
+    div('fxLayout'='row')
+      div('fxFlex'="40")
+        h4 Properties
+        mat-table('#table', '[dataSource]'="valueSetParameters.properties")
+          ng-container('matColumnDef'="code")
+            mat-header-cell('*matHeaderCellDef'="") Code
+            mat-cell('*matCellDef'="let property") {{property.code}}
+          ng-container('matColumnDef'="value")
+            mat-header-cell('*matHeaderCellDef'="") Value
+            mat-cell('*matCellDef'="let property") {{partValue(property)}}
+          mat-header-row('*matHeaderRowDef'="propertyTableHeader")
+          mat-row('*matRowDef'="let row; columns: propertyTableHeader;")
+      div('fxFlex'="60")
+        h4 Designations
+        mat-table('#table', '[dataSource]'="valueSetParameters.designations")
+          ng-container('matColumnDef'="value")
+            mat-header-cell('*matHeaderCellDef'="") Value
+            mat-cell('*matCellDef'="let designation") {{partValue(designation)}}
+          ng-container('matColumnDef'="use")
+            mat-header-cell('*matHeaderCellDef'="") Use
+            mat-cell('*matCellDef'="let designation")
+              | {{designation['use']['code']}}
+              | ({{designation['use']['display']}})
+              br
+              i {{designation['use']['system']}}
+          ng-container('matColumnDef'="language")
+            mat-header-cell('*matHeaderCellDef'="") Language
+            mat-cell('*matCellDef'="let designation") {{designation.language}}
+          mat-header-row('*matHeaderRowDef'="designationTableHeader")
+          mat-row('*matRowDef'="let row; columns: designationTableHeader;")
 
-        //- For searches *with* results.
-        div.col-sm-3("*ngIf"="results && results.expansion?.contains")
-
-            table.table.table-condensed.table-striped.table-hover#results
-                thead.thead-dark
-                    tr
-                        th Display
-                        th Code
-                tbody
-                    tr("*ngFor"="let n of results.expansion.contains" '(click)'="selectValueSet(n)" '[class.selected]'='n == valueSet')
-                        td {{n.display}}
-                        td {{n.code}}
-        .col-sm-9("*ngIf"="results && results.expansion?.contains")
-
-            // This is super annoying since it causes flicker while waiting for autoselection.
-            //- .jumbotron("*ngIf"="!valueSet && results.expansion?.contains")
-                h1 Hey bub.. you should really select something.
-            div("*ngIf"="valueSet && valueSetParameters")
-                //- Graph wizardry!
-                div.col-sm-12
-                //- div("*ngFor"="let p of valueSetParameters.parameter")
-                // This is duplicative with stuff shown elsewhere.
-                //- #value_set_header
-                    h1 {{valueSetParameters.display}}
-                    | From {{valueSetParameters.name}} ({{valueSetParameters.version}})
-                    hr
-                code-visualizer("[valueSet]"="valueSet" "[valueSetParameters]"="valueSetParameters", '(onSelection)'='nodeClicked($event)')
-
-                .row
-                    section.col-sm-5
-                        h4 Properties
-                        table.table.table-condensed
-                            thead
-                                tr
-                                    th Code
-                                    th Value
-                            tbody
-                                tr("*ngFor"="let p of valueSetParameters.properties")
-                                    td {{p['code']}}
-                                    td {{partValue(p)}}
-                    section.col-sm-7
-                        h4 Designations
-                        table.table.table-condensed
-                            thead
-                                tr
-                                    th Value
-                                    th Use
-                                    th Language
-                            tbody
-                                tr("*ngFor"="let d of valueSetParameters.designations")
-                                    td {{partValue(d)}}
-                                    td
-                                        | {{d['use']['code']}}
-                                        | ({{d['use']['display']}})
-                                        br
-                                        i {{d['use']['system']}}
-                                    td {{d['language']}}
-
-    #code_system_details.collapse.show("*ngIf"="codeSystem")
-        .card.card-body
-            .row
-                .col-sm-6
-                    button.btn.btn-info.pull-left(data-toggle="collapse" data-target="#code_system_details") X
-                    h2 &nbsp;{{codeSystem.name}}
-                    hr
-                    dl.dl-horizontal
-                        dt Version
-                        dd {{codeSystem.version}}
-                        dt Name
-                        dd {{codeSystem.name}}
-                        dt Status
-                        dd {{codeSystem.status}}
-                        dt Experimental
-                        dd {{codeSystem.experimental}}
-                        dt Date
-                        dd {{codeSystem.date}}
-                        dt publisher
-                        dd {{codeSystem.publisher}}
-                .col-sm-6
-                    dl.dl-horizontal
-                        dt Description
-                        dd {{codeSystem.description}}
-                        dt Copyright
-                        dd {{codeSystem.copyright}}
-                        dt Case Sensitive
-                        dd {{codeSystem.caseSensitive}}
-                        dt Value Set
-                        dd {{codeSystem.valueSet}}
-                        dt Hierarchy Meaning
-                        dd {{codeSystem.hierarchyMeaning}}
-                        dt Compositional
-                        dd {{codeSystem.compositional}}
-                        dt Version Needed?
-                        dd {{codeSystem.versionNeeded}}
-                        dt Content
-                        dd {{codeSystem.content}}
-    //- .row
-        .col-md-4("*ngFor"="let s of services")
-            .service("(click)"='select(s)')
-                //- .thumbnail.pull-left
-                //-     img(src="{{s.url}}/logo/medium")
-                //- h2 {{s.name}}
-
-                .row
-                    .col-sm-6
-                        //- .thumbnail
-                        img.logo(src="{{s.url}}/logo/medium")
-                    .col-sm-6
-                        h2 {{s.name}}
-                    .col-sm-12
-                        hr
-                        p {{s.description}}
-    //- button#close-service-button.btn.btn-default("*ngIf"='service' "(click)"="select(null)") Close
-    //- service("*ngIf"='service' "[service]"='service' "[licenses]"='licenses' "[status]"='status')
-
-
+div.home-container("*ngIf"="codeSystem")
+  mat-card
+    div('fxLayout'='row')
+      div('fxFlex')
+        h2 &nbsp;{{codeSystem.name}}
+          hr
+    div('fxLayout'='row')
+      div('fxFlex'="50")
+          mat-list
+            mat-list-item
+              p('mat-line')
+                b Version
+              p('mat-line') {{codeSystem.version}}
+            mat-list-item
+              p('mat-line')
+                b Name
+              p('mat-line') {{codeSystem.name}}
+            mat-list-item
+              p('mat-line')
+                b Status
+              p('mat-line') {{codeSystem.status}}
+            mat-list-item
+              p('mat-line')
+                b Experimental
+              p('mat-line') {{codeSystem.experimental}}
+            mat-list-item
+              p('mat-line')
+                b Date
+              p('mat-line') {{codeSystem.date}}
+            mat-list-item
+              p('mat-line')
+                b Publisher
+              p('mat-line') {{codeSystem.publisher}}
+            mat-list-item
+              p('mat-line')
+                b Copyright
+              p('mat-line') {{codeSystem.copyright}}
+      div('fxFlex'="50")
+        mat-list
+          mat-list-item
+            p('mat-line')
+              b Description
+            p('mat-line') {{codeSystem.description}}
+          mat-list-item
+            p('mat-line')
+              b Case Sensitive
+            p('mat-line') {{codeSystem.caseSensitive}}
+          mat-list-item
+            p('mat-line')
+              b Value Set
+            p('mat-line') {{codeSystem.valueSet}}
+          mat-list-item
+            p('mat-line')
+              b Hierarchy Meaning
+            p('mat-line') {{codeSystem.hierarchyMeaning}}
+          mat-list-item
+            p('mat-line')
+              b Compositional
+            p('mat-line') {{codeSystem.compositional}}
+          mat-list-item
+            p('mat-line')
+              b Version Needed?
+            p('mat-line') {{codeSystem.versionNeeded}}
+          mat-list-item
+            p('mat-line')
+              b Content
+            p('mat-line') {{codeSystem.content}}
 include layout/footer

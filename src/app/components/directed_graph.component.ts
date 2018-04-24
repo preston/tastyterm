@@ -24,7 +24,7 @@ interface Graph {
   selector: "directed-graph",
   styleUrls: ['../stylesheets/directed-graph.sass'],
   encapsulation: ViewEncapsulation.None,
-  template: `<svg width="1200" height="400"></svg>`
+  template: `<svg width="100%" height="400"></svg>`
 })
 export class DirectedGraphComponent implements OnInit {
   @Input('links') links: Link[];
@@ -52,7 +52,6 @@ export class DirectedGraphComponent implements OnInit {
 
         .attr("transform", d3.event.transform)
     }));
-    const width = +svg.attr('width');
     const height = +svg.attr('height');
     const textSpace = { x: 12, y: 0 };
 
@@ -62,9 +61,11 @@ export class DirectedGraphComponent implements OnInit {
     svg.selectAll('g').remove();
 
     this.simulation = d3.forceSimulation()
-      .force('link', d3.forceLink().distance(120).strength(1).id((d: any) => d.id))
+      .force('link', d3.forceLink().distance((d: any) => {
+        return d.label == 'parent' ? 80 : 130;
+      }).strength(1).id((d: any) => d.id))
       .force('charge', d3.forceManyBody())
-      .force('center', d3.forceCenter(170, 150));
+      .force('center', d3.forceCenter((window.innerWidth - 100) / 2, height / 2));
 
     if(this.links && this.nodes){
       console.info("Nodes: ", this.nodes);
@@ -94,7 +95,7 @@ export class DirectedGraphComponent implements OnInit {
         .attr('xoverflow', 'visible')
         .append('svg:path')
         .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
-        .attr('fill', '#999')
+        .attr('fill', '#b5b5b5')
         .style('stroke','none');
 
       const node = svg.append('g')
@@ -152,6 +153,7 @@ export class DirectedGraphComponent implements OnInit {
           node.selectAll('text')
             .attr('x', (d: any) => { return d.x + textSpace.x; })
             .attr('y', (d: any) => { return d.y + textSpace.y; });
+
         });
 
       this.simulation.force<d3.ForceLink<any, any>>('link')

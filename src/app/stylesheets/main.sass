@@ -1,73 +1,33 @@
-@import ribbons
+@import 'tastytheme.scss'
 
 $shadow: 0 40px 40px rgba(0, 0, 0, 0.9)
 $content_background: url("/assets/textures/crossword.png") repeat
 
 body
   background: url(/assets/textures/dust_scratches.png) repeat
+  display: block
+  margin: 0px
   // background: url(/images/backgrounds/photo-1456428199391-a3b1cb5e93ab.jpeg) no-repeat center center fixed
   // background-size: cover
-
-  footer
-    background-color: rgba(0,0,0,.1)
-    padding: 4px
-    color: #aaa
-
-  h2
-    text-shadow: 0 2px 2px rgba(0,0,0,.4)
 
   .logo
     max-height: 200px
     max-width: 200px
     object-fit: cover
 
-.ngx-charts-outer
-  // min-height: 300px
+mat-form-field
+  min-width: auto !important
+  .mat-form-field-infix
+    width: auto
 
-#close-button
-  position: absolute
-  z-index: 20
-  top: 90px
-  right: 60px
+.home-container
+  padding: 20px
+.toolbar-spacer
+  flex: 1 1 auto
 
+.autocomplete-custom-width
+  width: 100%
+  padding: 0px 15px 0px 0px
 
-#results
-  tbody
-    tr:hover
-      cursor: pointer
-    tr.selected
-      background-color: rgba(255,255,230,.8)
-
-
-
-.arrow-down
-  width: 0
-  height: 0
-  border-left: 5px solid transparent
-  border-right: 5px solid transparent
-  border-top: 5px solid #fff
-  display: inline-block
-  margin-right: 5px
-
-.arrow-right
-  margin-right: 5px
-  display: inline-block
-  width: 0
-  height: 0
-  border-top: 5px solid transparent
-  border-bottom: 5px solid transparent
-  border-left: 5px solid #fff
-
-.graph
-  .node
-    text
-      fill: #fff
-      font-size: 12px
-      font-weight: bold
-
-  .edge
-    path
-      stroke: #666 !important
-
-  .arrow-head
-    fill: #666
+.footer-body
+  text-align: center
