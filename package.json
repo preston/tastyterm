@@ -13,8 +13,8 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "env-setup": "node -e \"require('./additional-build-steps').env()\"",
-    "pug-compile": "node -e \"require('./additional-build-steps').env()\"",
-    "postinstall": "npm run pug-compile"
+    "pug-compile": "node -e \"require('./additional-build-steps').pug()\"",
+    "postinstall": "npm run pug-compile && npm run env-setup"
   },
   "private": true,
   "dependencies": {
