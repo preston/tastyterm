@@ -29,7 +29,7 @@ div.home-container('fxLayout'='column', '*ngIf'="results && results.expansion?.c
 
 div.home-container('fxLayout'='column', "*ngIf"="results && results.expansion?.contains")
     div('fxFlex', "*ngIf"="valueSet && valueSetParameters")
-      code-visualizer("[valueSet]"="valueSet" "[valueSetParameters]"="valueSetParameters", '(onSelection)'='nodeClicked($event)')
+      code-visualizer("[valueSet]"="valueSet", "[valueSetParameters]"="valueSetParameters", "[codeSystem]"="codeSystem", '(onSelection)'='nodeClicked($event)')
 div.home-container('*ngIf'="valueSetParameters")
   mat-card
     div('fxLayout'='row')

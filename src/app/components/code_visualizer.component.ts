@@ -16,6 +16,10 @@ import { ValueSet } from "../models/value_set";
 import { Parameters } from "../models/parameters";
 import { Node } from "../models/node";
 import { Link } from "../models/link";
+import { CodeSystem } from "../models/code_system";
+
+import { ValueSetService } from "../services/value_set.service";
+
 
 @Component({
   selector: "code-visualizer",
@@ -43,7 +47,11 @@ export class CodeVisualizerComponent implements OnInit {
   chart: any;
   countries: any[];
   graph: { links: any[]; nodes: any[] };
-
+  // Because of some weird block scope and angular change detection
+  // behaviour, we need to sadly set class variables for some work in
+  // the for loop.
+  nodesInLoop: any[] = [];
+  linksInLoop: any[] = [];
   view: any[];
 
   // options
@@ -355,7 +363,7 @@ export class CodeVisualizerComponent implements OnInit {
 
   public hierarchicalGraph = new HierarchicalGraph();
 
-  constructor(private element: ElementRef) {
+  constructor(private element: ElementRef, private valueSetService: ValueSetService) {
     this.setInterpolationType("Natural");
   }
 
@@ -370,6 +378,7 @@ export class CodeVisualizerComponent implements OnInit {
   }
 
   @Input() valueSet: ValueSet;
+  @Input() codeSystem: CodeSystem;
 
   ngOnChanges(changes: SimpleChanges) {
     console.log("Visualization input changed to:");
@@ -386,25 +395,35 @@ export class CodeVisualizerComponent implements OnInit {
       this.hierarchicalGraph.reset();
       let vs = this.valueSet;
       let vsp = this.valueSetParameters;
-      let center = new Node(vs.code, vs.code);
-      this.hierarchicalGraph.nodes.push(center);
+      let center = new Node(vs.code, vsp.display);
+      this.nodesInLoop.push(center);
       if (vs && vsp) {
-        for (let p of vsp.properties) {
-          switch (p["code"]) {
-            case "parent":
-              let parent = new Node(p["value"], p["value"]);
-              this.hierarchicalGraph.nodes.push(parent);
-              let pLink = new Link(center.id, parent.id, "parent");
-              this.hierarchicalGraph.links.push(pLink);
-              break;
-            case "child":
-              let child = new Node(p["value"], p["value"]);
-              this.hierarchicalGraph.nodes.push(child);
-              let cLink = new Link(child.id, center.id, "child");
-              this.hierarchicalGraph.links.push(cLink);
-              break;
+        // Call our service method which handles building an object
+        // with parent and children already sorted for us.
+        this.valueSetService.getParentsAndChildren(
+          this.codeSystem,
+          vs.code,
+          1000).subscribe(family => {
+          for(let parent of family[0]['expansion']['contains']){
+            let parentNode = new Node(parent["code"], parent["display"]);
+            this.nodesInLoop.push(parentNode);
+            let parentLink = new Link(center.id, parentNode.id, "parent");
+            this.linksInLoop.push(parentLink);
           }
-        }
+          for(let child of family[1]['expansion']['contains']){
+            let childNode = new Node(child["code"], child["display"]);
+            this.nodesInLoop.push(childNode);
+            let childLink = new Link(childNode.id, center.id, "child");
+            this.linksInLoop.push(childLink);
+          }
+          // Because of some weird block scope and angular change detection
+          // behaviour, we need to sadly use the class variables we set.
+          // Here we are setting the @Inputs to new objects instead of mutating them in place.
+          // Angular change detection would not know the object changed if we simply mutate them.
+          // They must be set anew.
+          this.hierarchicalGraph.nodes = this.nodesInLoop;
+          this.hierarchicalGraph.links = this.linksInLoop;
+        });
       }
     } else {
       this.hierarchicalGraph.reset();

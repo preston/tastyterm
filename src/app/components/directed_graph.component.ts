@@ -111,7 +111,9 @@ export class DirectedGraphComponent implements OnInit {
       node.append("text")
         .attr("x", 12)
         .attr("dy", ".35em")
-        .text((d) => { return d.id; });
+        .text((d) => {
+          return d.label + ' - ' + d.id;
+        });
       svg.selectAll('text').call(d3.drag()
         .on('start', (d) => this.dragstarted(d))
         .on('drag', (d) => this.dragged(d))
