@@ -47,13 +47,20 @@ export class DirectedGraphComponent implements OnInit {
   }
 
   renderGraph() {
-    const svg = d3.select('svg').call(d3.zoom().on("zoom", () => {
-      svg.selectAll('g')
 
-        .attr("transform", d3.event.transform)
-    }));
+    const svg = d3.select('svg');
+
     const height = +svg.attr('height');
     const textSpace = { x: 12, y: 0 };
+
+    svg.call(d3.zoom()
+      .scaleExtent([1, 1])
+      .on("zoom", () => {
+        svg.selectAll('g')
+          .attr("transform", d3.event.transform)
+      })
+    ).on("wheel.zoom", null);
+
 
     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
