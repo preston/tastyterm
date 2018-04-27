@@ -24,7 +24,7 @@ interface Graph {
   selector: "directed-graph",
   styleUrls: ['../stylesheets/directed-graph.sass'],
   encapsulation: ViewEncapsulation.None,
-  template: `<svg width="100%" height="400"></svg>`
+  template: `<svg id="visualSVG" width="100%" height="400"></svg>`
 })
 export class DirectedGraphComponent implements OnInit {
   @Input('links') links: Link[];
@@ -48,7 +48,7 @@ export class DirectedGraphComponent implements OnInit {
 
   renderGraph() {
 
-    const svg = d3.select('svg');
+    const svg = d3.select('#visualSVG');
 
     const height = +svg.attr('height');
     const textSpace = { x: 12, y: 0 };
@@ -112,7 +112,7 @@ export class DirectedGraphComponent implements OnInit {
         .enter();
 
       const circle = node.append('circle')
-        .attr('r', 9)
+        .attr('r', 10)
         .attr('fill', (d: any) => {
           return color(d.relationship);
         });
