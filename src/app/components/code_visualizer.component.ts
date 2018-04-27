@@ -392,10 +392,10 @@ export class CodeVisualizerComponent implements OnInit {
   updateVisualization() {
     if (this.valueSet) {
       console.log("Updating visualization...");
-      this.hierarchicalGraph.reset();
+      this.clearGraph();
       let vs = this.valueSet;
       let vsp = this.valueSetParameters;
-      let center = new Node(vs.code, vsp.display);
+      let center = new Node(vs.code, vsp.display, 'center');
       this.nodesInLoop.push(center);
       if (vs && vsp) {
         // Call our service method which handles building an object
@@ -404,32 +404,42 @@ export class CodeVisualizerComponent implements OnInit {
           this.codeSystem,
           vs.code,
           1000).subscribe(family => {
-          for(let parent of family[0]['expansion']['contains']){
-            let parentNode = new Node(parent["code"], parent["display"]);
-            this.nodesInLoop.push(parentNode);
-            let parentLink = new Link(center.id, parentNode.id, "parent");
-            this.linksInLoop.push(parentLink);
-          }
-          for(let child of family[1]['expansion']['contains']){
-            let childNode = new Node(child["code"], child["display"]);
-            this.nodesInLoop.push(childNode);
-            let childLink = new Link(childNode.id, center.id, "child");
-            this.linksInLoop.push(childLink);
-          }
-          // Because of some weird block scope and angular change detection
-          // behaviour, we need to sadly use the class variables we set.
-          // Here we are setting the @Inputs to new objects instead of mutating them in place.
-          // Angular change detection would not know the object changed if we simply mutate them.
-          // They must be set anew.
-          this.hierarchicalGraph.nodes = this.nodesInLoop;
-          this.hierarchicalGraph.links = this.linksInLoop;
+            console.log(family);
+            if(family[0]['expansion']['contains']){
+              for(let parent of family[0]['expansion']['contains']){
+                let parentNode = new Node(parent["code"], parent["display"], 'parent');
+                this.nodesInLoop.push(parentNode);
+                let parentLink = new Link(center.id, parentNode.id, "parent");
+                this.linksInLoop.push(parentLink);
+              }
+            }
+            if(family[1]['expansion']['contains']){
+              for(let child of family[1]['expansion']['contains']){
+                let childNode = new Node(child["code"], child["display"], 'child');
+                this.nodesInLoop.push(childNode);
+                let childLink = new Link(childNode.id, center.id, "child");
+                this.linksInLoop.push(childLink);
+              }
+            }
+            // Because of some weird block scope and angular change detection
+            // behaviour, we need to sadly use the class variables we set.
+            // Here we are setting the @Inputs to new objects instead of mutating them in place.
+            // Angular change detection would not know the object changed if we simply mutate them.
+            // They must be set anew.
+            this.hierarchicalGraph.nodes = this.nodesInLoop;
+            this.hierarchicalGraph.links = this.linksInLoop;
         });
       }
     } else {
-      this.hierarchicalGraph.reset();
+      this.clearGraph();
     }
   }
 
+  clearGraph(){
+    this.nodesInLoop = [];
+    this.linksInLoop = [];
+    this.hierarchicalGraph.reset();
+  }
   selectChart(chartSelector) {
     this.chartType = chartSelector;
     for (const group of this.chartGroups) {

@@ -106,7 +106,9 @@ export class DirectedGraphComponent implements OnInit {
 
       const circle = node.append('circle')
         .attr('r', 9)
-        .attr('fill', (d: any) => color(d.group));
+        .attr('fill', (d: any) => {
+          return color(d.relationship);
+        });
 
       node.append("text")
         .attr("x", 12)
