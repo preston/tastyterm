@@ -22,10 +22,12 @@ div.home-container('fxLayout'='column')
             mat-select#result_limit("name"='result_limit', "[(ngModel)]"="resultLimit", "placeholder"="Limit Results To")
               mat-option("*ngFor"="let l of getLimits()", "[value]"="l") {{l}}
       div('fxLayout'='row', "*ngIf"="results && results.expansion?.contains")
+        div('fxFlex', class="")
+          mat-slide-toggle('(change)'='chartTypeToggled($event)','[checked]'="graphType ==='3D'") 3D
         div('fxFlex', class="legend-container")
           svg(class='legend-node', 'height'="20" 'width'="20")
             circle(cx="10" cy="10" r="9" stroke-width="3" fill="rgb(31, 119, 180)")
-          div Center
+          div Current Term
           svg(class='legend-node','height'="20" 'width'="20")
             circle(cx="10" cy="10" r="9" stroke-width="3" fill="rgb(255, 127, 14)")
           div Parent
@@ -40,7 +42,10 @@ div.home-container('fxLayout'='column', '*ngIf'="results && results.expansion?.c
 
 div.home-container('fxLayout'='column', "*ngIf"="results && results.expansion?.contains")
     div('fxFlex', "*ngIf"="valueSet && valueSetParameters")
-      code-visualizer("[valueSet]"="valueSet", "[valueSetParameters]"="valueSetParameters", "[codeSystem]"="codeSystem", '(onSelection)'='nodeClicked($event)')
+      code-visualizer("[valueSet]"="valueSet",
+      "[valueSetParameters]"="valueSetParameters",
+      "[codeSystem]"="codeSystem",
+      '(onSelection)'='nodeClicked($event)')
 div.home-container('*ngIf'="valueSetParameters")
   mat-card
     div('fxLayout'='row')

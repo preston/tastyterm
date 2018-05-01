@@ -20,6 +20,7 @@ import { CodeSystemComponent } from './components/code_system.component';
 import { ConceptMapComponent } from './components/concept_map.component';
 import { CodeVisualizerComponent } from './components/code_visualizer.component';
 import { DirectedGraphComponent } from './components/directed_graph.component';
+import { DirectedGraph3dComponent } from './components/directed_graph_3d.component';
 
 // Services
 import { AuthenticationService } from './services/authentication.service';
@@ -47,7 +48,8 @@ const routing = RouterModule.forRoot(
     HomeComponent,
     CodeSystemComponent,
     CodeVisualizerComponent,
-    DirectedGraphComponent
+    DirectedGraphComponent,
+    DirectedGraph3dComponent
   ],
   imports: [
     BrowserModule,

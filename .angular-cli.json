@@ -23,7 +23,11 @@
         "app/stylesheets/main.sass",
         "styles.sass"
       ],
-      "scripts": [],
+      "scripts": [
+        "../node_modules/three/build/three.js",
+        "../node_modules/3d-force-graph/dist/3d-force-graph.js",
+        "../node_modules/three-spritetext/dist/three-spritetext.js"
+      ],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "env": "environments/environment.ts",

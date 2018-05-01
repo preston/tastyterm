@@ -11,7 +11,8 @@ import {
   MatAutocompleteModule,
   MatChipsModule,
   MatTableModule,
-  MatListModule
+  MatListModule,
+  MatSlideToggleModule
 } from '@angular/material';
 import { FlexLayoutModule } from "@angular/flex-layout";
 
@@ -29,7 +30,8 @@ import { FlexLayoutModule } from "@angular/flex-layout";
     MatAutocompleteModule,
     MatChipsModule,
     MatTableModule,
-    MatListModule
+    MatListModule,
+    MatSlideToggleModule
   ],
   exports: [
     ReactiveFormsModule,
@@ -43,7 +45,8 @@ import { FlexLayoutModule } from "@angular/flex-layout";
     MatAutocompleteModule,
     MatChipsModule,
     MatTableModule,
-    MatListModule
+    MatListModule,
+    MatSlideToggleModule
   ],
   declarations: []
 })

@@ -13,11 +13,12 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "env-setup": "node -e \"require('./additional-build-steps').env()\"",
-    "pug-compile": "node -e \"require('./additional-build-steps').pug()\"",
-    "postinstall": "npm run pug-compile && npm run env-setup"
+    "pug-rule": "node -e \"require('./additional-build-steps').pug()\"",
+    "postinstall": "npm run pug-rule && npm run env-setup"
   },
   "private": true,
   "dependencies": {
+    "3d-force-graph": "^1.31.1",
     "@angular/animations": "^5.2.10",
     "@angular/cdk": "^5.2.5",
     "@angular/common": "^5.2.0",
@@ -34,6 +35,7 @@
     "@types/core-js": "^0.9.43",
     "@types/d3": "^5.0.0",
     "@types/d3-shape": "^1.2.2",
+    "@types/three": "^0.91.10",
     "angular-in-memory-web-api": "^0.5.3",
     "angular2-toaster": "^5.0.0",
     "angular2-uuid": "^1.1.1",
@@ -43,6 +45,8 @@
     "popper.js": "^1.12.9",
     "reflect-metadata": "^0.1.10",
     "rxjs": "^5.5.6",
+    "three": "^0.92.0",
+    "three-spritetext": "^1.0.5",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {

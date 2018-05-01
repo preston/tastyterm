@@ -4,6 +4,8 @@ import { FormControl } from "@angular/forms";
 
 import { Observable } from "rxjs/Observable";
 
+import { MatSlideToggleChange } from "@angular/material";
+
 import * as fs from 'fs';
 
 import { environment } from '../../environments/environment';
@@ -60,10 +62,12 @@ export class HomeComponent implements OnInit {
   //
   searchFilter: string = "";
   results: ValueSet = null;
+  selectedTerm: string = null;
   resultLimit: number = HomeComponent.LIMITS[0];
   searching: boolean = false; // Used for visually indicating when a search is in progress.
   propertyTableHeader: string[] = ['code','value'];
   designationTableHeader: string[] = ['value', 'use', 'language'];
+  graphType: string = '3D';
   public static LIMITS: Array<number> = [10, 50, 100];
   // status: Object;
   public static FALLBACK_SERVER: string = "https://ontoserver.hspconsortium.org/fhir";
@@ -94,6 +98,10 @@ export class HomeComponent implements OnInit {
       this.activatedRoute.params.subscribe((params) => {
         if(params["termId"]){
           this.selectAsValueSet(params["termId"]);
+          this.selectedTerm = params["termId"];
+        }
+        if(params["graphType"]){
+          this.graphType = params["graphType"];
         }
       });
     }).catch(((err) => {
@@ -248,7 +256,7 @@ export class HomeComponent implements OnInit {
   }
 
   nodeClicked(node) {
-    this.router.navigate(['/term/' + node.id]);
+    this.router.navigate(['/term/' + node.id, { graphType: this.graphType }]);
   }
 
   selectAsValueSet(incomingValue) {
@@ -318,6 +326,14 @@ export class HomeComponent implements OnInit {
         console.log("TOKEN_ACQUIRED event fired.");
         this.reloadCodeSystems();
         break;
+    }
+  }
+
+  chartTypeToggled(event: MatSlideToggleChange){
+    if (event.checked){
+      this.router.navigate(['/term/' + this.selectedTerm, { graphType: '3D' }]);
+    } else {
+      this.router.navigate(['/term/' + this.selectedTerm, { graphType: '2D' }]);
     }
   }
   logout() {

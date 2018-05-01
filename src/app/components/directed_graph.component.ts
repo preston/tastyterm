@@ -24,7 +24,7 @@ interface Graph {
   selector: "directed-graph",
   styleUrls: ['../stylesheets/directed-graph.sass'],
   encapsulation: ViewEncapsulation.None,
-  template: `<svg id="visualSVG" width="100%" height="400"></svg>`
+  template: `<svg id="visualSVG" width="100%" height="500"></svg>`
 })
 export class DirectedGraphComponent implements OnInit {
   @Input('links') links: Link[];
@@ -38,7 +38,9 @@ export class DirectedGraphComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.nodes || changes.links) {
-      this.renderGraph();
+      if(!changes.nodes.firstChange || !changes.links.firstChange){
+        this.renderGraph();
+      }
     }
     // console.log(changes.valueSet.previousValue);// previous selected value
   }

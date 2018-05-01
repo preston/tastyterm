@@ -10,6 +10,8 @@ import {
   SimpleChanges
 } from "@angular/core";
 
+import { ActivatedRoute } from "@angular/router";
+
 import * as shape from "d3-shape";
 import { HierarchicalGraph } from "../models/hierarchical_graph";
 import { ValueSet } from "../models/value_set";
@@ -27,10 +29,13 @@ import { ValueSetService } from "../services/value_set.service";
   templateUrl: "../views/code_visualizer.pug"
 })
 export class CodeVisualizerComponent implements OnInit {
+  @Input() valueSet: ValueSet;
+  @Input() codeSystem: CodeSystem;
+  @Input() valueSetParameters: Parameters;
   @Output() onSelection = new EventEmitter<Node>();
 
+  graphType: string = '3D';
   theme: string = "dark";
-  chartType: string = "directed-graph";
   chartGroups = [
     {
       name: "Other Charts",
@@ -363,7 +368,9 @@ export class CodeVisualizerComponent implements OnInit {
 
   public hierarchicalGraph = new HierarchicalGraph();
 
-  constructor(private element: ElementRef, private valueSetService: ValueSetService) {
+  constructor(private element: ElementRef,
+              private valueSetService: ValueSetService,
+              private activatedRoute: ActivatedRoute,) {
     this.setInterpolationType("Natural");
   }
 
@@ -373,12 +380,15 @@ export class CodeVisualizerComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.selectChart(this.chartType);
+    this.activatedRoute.params.subscribe((params) => {
+      if(params["graphType"]){
+        this.graphType = params["graphType"];
+      }
+    });
     // setInterval(this.updateVisualization.bind(this), 1000);
   }
 
-  @Input() valueSet: ValueSet;
-  @Input() codeSystem: CodeSystem;
+
 
   ngOnChanges(changes: SimpleChanges) {
     console.log("Visualization input changed to:");
@@ -387,8 +397,6 @@ export class CodeVisualizerComponent implements OnInit {
     }
     // console.log(changes.valueSet.previousValue);// previous selected value
   }
-
-  @Input() valueSetParameters: Parameters;
   updateVisualization() {
     if (this.valueSet) {
       console.log("Updating visualization...");
@@ -439,17 +447,6 @@ export class CodeVisualizerComponent implements OnInit {
     this.nodesInLoop = [];
     this.linksInLoop = [];
     this.hierarchicalGraph.reset();
-  }
-  selectChart(chartSelector) {
-    this.chartType = chartSelector;
-    for (const group of this.chartGroups) {
-      for (const chart of group.charts) {
-        if (chart.selector === chartSelector) {
-          this.chart = chart;
-          return;
-        }
-      }
-    }
   }
 
   select(data) {
