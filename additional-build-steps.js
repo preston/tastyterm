@@ -34,7 +34,7 @@ module.exports.pug = function pug() {
   const pug_rule = `\n{ test: /.pug$/, loader: [ 'html-loader', 
   { loader: "pug-html-loader", options: { doctype: 'html', pretty: true } } ], },`;
 
-// Open the file
+  // Open the file
   fs.readFile(commonCliConfig, (err, data) => {
     if (err) { throw err; }
     const configText = data.toString();
@@ -119,9 +119,13 @@ module.exports.env = function environmentVariables() {
   `;
 
   // Create the environment directory in the project if it doesn't already exist.
+  let dirSrcPath = path.join(__dirname, '/src');
+  if (!fs.existsSync(dirSrcPath)) {
+    fs.mkdirSync(dirSrcPath);
+  }
   let dirPath = path.join(__dirname, '/src/environments/');
   if (!fs.existsSync(dirPath)) {
-    mkDirByPathSync(dirPath)
+    fs.mkdirSync(dirPath);
   }
   // Actually write the file and save it.
   fs.writeFile(path.join(__dirname, targetPath), envConfigFile, function (err) {
@@ -134,23 +138,3 @@ module.exports.env = function environmentVariables() {
     console.log(`Success! environment.ts generated at ${targetPath}!`);
   });
 };
-
-// Utility function used to support mkdir with the fs module
-// by creating full paths if they don't exist.
-function mkDirByPathSync(targetDir, {isRelativeToScript = false} = {}) {
-  const sep = path.sep;
-  const initDir = path.isAbsolute(targetDir) ? sep : '';
-  const baseDir = isRelativeToScript ? __dirname : '.';
-  targetDir.split(sep).reduce((parentDir, childDir) => {
-    const curDir = path.resolve(baseDir, parentDir, childDir);
-    try {
-      fs.mkdirSync(curDir);
-      console.log(`Directory ${curDir} created!`);
-    } catch (err) {
-      if (err.code !== 'EEXIST') {
-        throw err;
-      }
-    }
-    return curDir;
-  }, initDir);
-}
