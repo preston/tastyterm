@@ -7,7 +7,7 @@ import { Observable } from 'rxjs/Observable';
 import { BaseService } from "./base.service";
 import { QuickTermService } from './tastyterm.service';
 
-import { Bundle } from '../models/Bundle';
+import { Bundle } from '../models/bundle';
 import { CodeSystem } from '../models/code_system';
 import { ValueSet } from '../models/value_set';
 
