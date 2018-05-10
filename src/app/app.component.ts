@@ -2,7 +2,10 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app',
-  template: '<router-outlet></router-outlet>',
+  template: `
+    <toaster-container></toaster-container>
+    <router-outlet></router-outlet>
+  `,
   styleUrls: ['./app.component.sass']
 })
 export class AppComponent {

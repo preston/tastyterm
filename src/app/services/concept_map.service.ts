@@ -11,6 +11,7 @@ import { Bundle } from "../models/bundle";
 import { ConceptMap } from "../models/concept_map";
 import { Parameters } from "../models/parameters";
 import { CodeSystem } from "../models/code_system";
+import {AuthenticationService} from "./authentication.service";
 
 @Injectable()
 export class ConceptMapService extends BaseService {
@@ -18,9 +19,11 @@ export class ConceptMapService extends BaseService {
 	public static PATH: string = '/ConceptMap';
 	public static TRANSLATE: string = '/$translate';
 
-	constructor(quicktermService: QuickTermService, http: HttpClient) {
-		super(quicktermService, http);
-	}
+  constructor(quickTermService: QuickTermService,
+              http: HttpClient,
+              protected authenticationService: AuthenticationService) {
+    super(quickTermService, http, authenticationService);
+  }
 
 	url(): string {
 		return this.quickTermService.url + ConceptMapService.PATH;

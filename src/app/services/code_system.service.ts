@@ -11,6 +11,15 @@ import { Bundle } from "../models/bundle";
 import { Parameter } from "../models/parameter";
 import { CodeSystem } from "../models/code_system";
 import { ValueSet } from "../models/value_set";
+import 'rxjs/add/operator/retry';
+import 'rxjs/add/operator/retryWhen';
+import {catchError} from "rxjs/operators";
+import {AuthenticationService} from "./authentication.service";
+import "rxjs/add/operator/mergeMap";
+import "rxjs/add/operator/take";
+import "rxjs/add/operator/concat";
+import "rxjs/add/operator/zip";
+import "rxjs/add/observable/range";
 
 @Injectable()
 export class CodeSystemService extends BaseService {
@@ -18,8 +27,10 @@ export class CodeSystemService extends BaseService {
   public static PATH: string = '/CodeSystem';
   public static LOOKUP: string = '/$lookup';
 
-  constructor(quickTermService: QuickTermService, http: HttpClient) {
-    super(quickTermService, http);
+  constructor(quickTermService: QuickTermService,
+              http: HttpClient,
+              authenticationService: AuthenticationService) {
+    super(quickTermService, http, authenticationService);
   }
 
   url(): string {
@@ -27,10 +38,27 @@ export class CodeSystemService extends BaseService {
   }
 
   bundle(): Observable<Bundle<CodeSystem>> {
-    let obs = this.http.get(this.url(), this.options()).map((res) => {
-      return <Bundle<CodeSystem>> res;
-    });
-    return obs;
+    return this.http.get(this.url(), this.options())
+      .retryWhen(
+        attempts =>
+          attempts
+            .map((res) => {
+              return this.authenticationService.renewToken().subscribe((token)=>{
+                if(token){
+                  return Observable.of(token);
+                } else {
+                  return Observable.throw({error: 'No retry'});
+                }
+              },
+              (error) => {
+                return Observable.throw({error: error});
+              })
+            })
+            .take(1)
+      )
+      .map((res) => {
+        return <Bundle<CodeSystem>> res;
+      });
   }
 
   // Gets details of a specific code.

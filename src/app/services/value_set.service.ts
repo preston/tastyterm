@@ -10,6 +10,7 @@ import { QuickTermService } from './tastyterm.service';
 import { Bundle } from '../models/bundle';
 import { CodeSystem } from '../models/code_system';
 import { ValueSet } from '../models/value_set';
+import {AuthenticationService} from "./authentication.service";
 
 @Injectable()
 export class ValueSetService extends BaseService {
@@ -18,8 +19,10 @@ export class ValueSetService extends BaseService {
   public static EXPAND: string = '/$expand';
   public static LOOKUP: string = '/$lookup';
 
-  constructor(quickTermService: QuickTermService, http: HttpClient) {
-      super(quickTermService, http);
+  constructor(quickTermService: QuickTermService,
+              http: HttpClient,
+              protected authenticationService: AuthenticationService) {
+    super(quickTermService, http, authenticationService);
   }
 
   url(): string {

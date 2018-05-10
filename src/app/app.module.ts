@@ -14,6 +14,7 @@ import { NgxGraphModule } from "@swimlane/ngx-graph";
 
 // Components
 import { AppComponent } from './app.component';
+import { LaunchComponent } from './components/launch.component';
 import { HomeComponent } from './components/home.component';
 import { ApiComponent } from './components/api.component';
 import { CodeSystemComponent } from './components/code_system.component';
@@ -36,14 +37,16 @@ const routing = RouterModule.forRoot(
   [
     { path: '', component: HomeComponent },
     { path: 'term/:termId', component: HomeComponent },
-    { path: 'api', component: ApiComponent }
+    { path: 'api', component: ApiComponent },
+    { path: 'launch', component: LaunchComponent }
   ],
-  { enableTracing: true } // <-- debugging purposes only
+  { enableTracing: false } // <-- debugging purposes only
 );
 
 @NgModule({
   declarations: [
     AppComponent,
+    LaunchComponent,
     ApiComponent,
     HomeComponent,
     CodeSystemComponent,

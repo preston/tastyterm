@@ -20,10 +20,7 @@ import { ValueSet } from "../models/value_set";
 import { AuditEvent } from "../models/audit_event";
 import { AuthEvent, AuthEventType } from "../models/auth_event";
 
-import {
-  ToasterModule,
-  ToasterService
-} from "angular2-toaster/angular2-toaster";
+import { ToasterService } from "angular2-toaster/angular2-toaster";
 
 import { QuickTermService } from "../services/tastyterm.service";
 import { CodeSystemService } from "../services/code_system.service";
@@ -91,9 +88,6 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.processSmartLaunch().then((promiseResponse) => {
-      // Showing how we can read environment specific config in the UI,
-      // that is generated at build time by Angular CLI.
-      console.log("OAUTH_CLIENT_ID", environment.TASTYTERM_OAUTH_CLIENT_ID);
       // Subscribe to query parameters that let us link to specific terms
       this.activatedRoute.params.subscribe((params) => {
         if(params["termId"]){
@@ -141,18 +135,27 @@ export class HomeComponent implements OnInit {
 
   processSmartLaunch(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      console.log("Checking for FHIR launch.");
       this.activatedRoute.queryParams.subscribe(params => {
-        // for (let p in params) {
-        // 	console.log(p);
-        // }
-        console.log("Checking for FHIR launch.");
+        console.info("Checking for FHIR launch.");
         let code: string = params["code"];
         let state: string = params["state"];
         if (code && state) {
+          // Set our code and state id in local storage for now
+          // so we don't have to keep them in the url as we route
+          // to other components
+          localStorage.setItem(
+            'code',
+            code
+          );
+          localStorage.setItem(
+            'stateId',
+            state
+          );
           // We should be receiving an authenticated launch!
-          this.authenticationService.getToken(code, state);
-          resolve(true);
+          this.authenticationService.handleToken().subscribe((token) => {
+            resolve(true);
+          });
+
         } else {
           // We're starting in standalone mode, and need a fallback server.
           // Just a reasonable default! This is overriden on SMART launch.

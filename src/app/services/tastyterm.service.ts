@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import {HttpHeaders, HttpClient, HttpParams} from '@angular/common/http';
 import 'rxjs/add/operator/map';
 
+import { environment } from '../../environments/environment';
 
 @Injectable()
 export class QuickTermService {
@@ -18,8 +19,10 @@ export class QuickTermService {
   public requestOptions(includeBearerToken: boolean) {
     let headers = new HttpHeaders({ 'Accept': 'application/json' });
     if (includeBearerToken) {
-      headers.append('Authorization', 'Bearer ' + localStorage.getItem(QuickTermService.STORAGE_BEARER_TOKEN_KEY));
-      headers.append('Accept', 'Accept: application/json+fhir');
+      // Headers object is immutable so we must set it anew.
+      // See https://angular.io/guide/http#update-headers
+      headers = headers
+        .set('Authorization', 'Bearer ' + localStorage.getItem(QuickTermService.STORAGE_BEARER_TOKEN_KEY))
     }
     let params = new HttpParams();
     // return new RequestOptions({ headers: headers, withCredentials: true, params: params });
