@@ -39,23 +39,7 @@ export class CodeSystemService extends BaseService {
 
   bundle(): Observable<Bundle<CodeSystem>> {
     return this.http.get(this.url(), this.options())
-      .retryWhen(
-        attempts =>
-          attempts
-            .map((res) => {
-              return this.authenticationService.renewToken().subscribe((token)=>{
-                if(token){
-                  return Observable.of(token);
-                } else {
-                  return Observable.throw({error: 'No retry'});
-                }
-              },
-              (error) => {
-                return Observable.throw({error: error});
-              })
-            })
-            .take(1)
-      )
+      .pipe(this.tokenPipe)
       .map((res) => {
         return <Bundle<CodeSystem>> res;
       });
@@ -68,9 +52,11 @@ export class CodeSystemService extends BaseService {
     opts.params = opts.params.append('system', codeSystem.url);
     opts.params = opts.params.append('version', codeSystem.version);
 
-    let obs = this.http.get(this.url() + CodeSystemService.LOOKUP, opts).map((res) => {
-      return <Parameter[]> res;
-    });
+    let obs = this.http.get(this.url() + CodeSystemService.LOOKUP, opts)
+      .pipe(this.tokenPipe)
+      .map((res) => {
+        return <Parameter[]> res;
+      });
     return obs;
   }
 

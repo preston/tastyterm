@@ -35,7 +35,9 @@ export class ValueSetService extends BaseService {
     opts.params = opts.params.append('identifier', codeSystem.valueSet);
     opts.params = opts.params.append('filter', filter);
     opts.params = opts.params.append('count', limit.toString());
-    return this.http.get(this.url() + ValueSetService.EXPAND, opts).map((res) => {
+    return this.http.get(this.url() + ValueSetService.EXPAND, opts)
+      .pipe(this.tokenPipe)
+      .map((res) => {
       return <ValueSet> res;
     });
   }
@@ -103,8 +105,8 @@ export class ValueSetService extends BaseService {
     // the caller simply treats it as any other single observable.
     // See an example usage in code_visualizer.component.ts.
     return zip(
-      this.http.post(this.url() + ValueSetService.EXPAND, bodyParents),
-      this.http.post(this.url() + ValueSetService.EXPAND, bodyChildren)
+      this.http.post(this.url() + ValueSetService.EXPAND, bodyParents).pipe(this.tokenPipe),
+      this.http.post(this.url() + ValueSetService.EXPAND, bodyChildren).pipe(this.tokenPipe)
     );
   }
 
@@ -113,7 +115,9 @@ export class ValueSetService extends BaseService {
     opts.params = opts.params.append('code', code);
     opts.params = opts.params.append('system', codeSystem.url);
     opts.params = opts.params.append('version', codeSystem.version);
-    return this.http.get(this.url() + '/' + ValueSetService.LOOKUP, opts).map((res) => {
+    return this.http.get(this.url() + '/' + ValueSetService.LOOKUP, opts)
+      .pipe(this.tokenPipe)
+      .map((res) => {
       return <ValueSet> res;
     });
   }
@@ -122,7 +126,9 @@ export class ValueSetService extends BaseService {
     opts.params = opts.params.append('code', code);
     opts.params = opts.params.append('system', codeSystem.url);
     opts.params = opts.params.append('version', codeSystem.version);
-    return this.http.get(this.url() + '/' + ValueSetService.EXPAND, opts).map((res) => {
+    return this.http.get(this.url() + '/' + ValueSetService.EXPAND, opts)
+      .pipe(this.tokenPipe)
+      .map((res) => {
       return <ValueSet> res;
     });
   }

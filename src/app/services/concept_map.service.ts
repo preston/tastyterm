@@ -30,7 +30,9 @@ export class ConceptMapService extends BaseService {
 	}
 
 	bundle(): Observable<Bundle<ConceptMap>> {
-		let obs = this.http.get(ConceptMapService.PATH, this.options()).map((res) => {
+		let obs = this.http.get(ConceptMapService.PATH, this.options())
+      .pipe(this.tokenPipe)
+      .map((res) => {
       return <Bundle<ConceptMap>> res;
     });
 		return obs;
@@ -49,7 +51,9 @@ export class ConceptMapService extends BaseService {
     opts.params = opts.params.append('version', codeSystem.version);
     opts.params = opts.params.append('source', codeSystem.valueSet);
 
-		let obs = this.http.get(this.url() + ConceptMapService.TRANSLATE, opts).map((res) => {
+		let obs = this.http.get(this.url() + ConceptMapService.TRANSLATE, opts)
+      .pipe(this.tokenPipe)
+      .map((res) => {
 		  return <Parameters> res
     });
 		return obs;
