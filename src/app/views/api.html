@@ -1,0 +1,21 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3">
+            <h2><span class="fa fa-transfer"></span> Developer API</h2>
+            <p><a href="/">TastyTerm</a> supports a RESTful JSON API for developing your own mashups.</p>
+            <p>
+                Developers are free to integrate TastyTerm into custom applications. It's fine to use the public site for light development and testing purposes, but you'll be blocked if you make excessive requests. If you're integrating with a heavy production app,
+                you need to deploy your own copy of<a href="/">TastyTerm</a>.
+            </p>
+        </div>
+        <div class="col-sm-9">
+            <div class="well" id="services">
+                <h4><small>GET</small> the global service list</h4>
+                <!-- <p><a [href]="tastyTermService.getUrl() + '/services.json'">{{TastyTermService.url}}/services.json</a></p> -->
+                <button class="btn btn-primary" aria-controls="services_result" aria-expanded="false" data-target="#services_result" data-toggle="collapse" type="button"><span class="fa fa-eye-open"></span> Show Result</button>
+                <pre class="collapse" id="services_result">\n\t\t\t\t\t
+\t\t\t\t</pre>
+            </div>
+        </div>
+    </div>
+</div>

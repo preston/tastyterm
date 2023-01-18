@@ -1,15 +1,15 @@
 export class ValueSet {
 
-  public code: string;
-  public experimental: boolean;
-  public name: string;
-  public status: string;
-  public url: string;
-  public version: string;
-  public immutable: boolean;
-  public purpose: string;
-  public copyright: string;
+  public code: string | null = null;
+  public experimental: boolean | null = null;
+  public name: string | null = null;
+  public status: string | null = null;
+  public url: string | null = null;
+  public version: string | null = null;
+  public immutable: boolean | null = null;
+  public purpose: string | null = null;
+  public copyright: string | null = null;
 
-  public expansion: Object;
+  public expansion: {contains: any[]} = {contains: []};
 
 }

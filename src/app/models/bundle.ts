@@ -1,4 +1,4 @@
 export class Bundle<T> {
-	public total: number;
-	public entry: Array<T>;
+	public total: number | undefined;
+	public entry: {fullUrl: string, resource: T}[] = [];// | undefined;
 }

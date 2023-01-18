@@ -1,0 +1,51 @@
+@import 'directed-graph.scss';
+@import 'directed-graph-3d.scss';
+$shadow: 0 40px 40px rgba(0, 0, 0, 0.9);
+$content_background: url("/assets/textures/crossword.png") repeat;
+body {
+    background: url(/assets/textures/dust_scratches.png) repeat;
+    display: block;
+    margin: 0px;
+    // background: url(/images/backgrounds/photo-1456428199391-a3b1cb5e93ab.jpeg) no-repeat center center fixed
+    // background-size: cover
+    .logo {
+        max-height: 200px;
+        max-width: 200px;
+        object-fit: cover;
+    }
+}
+
+mat-form-field {
+    min-width: auto !important;
+    .mat-form-field-infix {
+        width: auto;
+    }
+}
+
+.home-container {
+    padding: 20px;
+}
+
+.toolbar-spacer {
+    flex: 1 1 auto;
+}
+
+.autocomplete-custom-width {
+    width: 100%;
+    padding: 0px 15px 0px 0px;
+}
+
+.footer-body {
+    text-align: center;
+}
+
+.legend-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    text-align: right;
+}
+
+.legend-node {
+    margin: -3px 3px 0px 15px;
+}

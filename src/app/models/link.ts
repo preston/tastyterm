@@ -3,5 +3,5 @@ export class Link {
     public source: string,
     public target: string,
     public label: string
-  ) {}
+  ) { }
 }

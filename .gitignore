@@ -2,20 +2,27 @@
 
 # compiled output
 /dist
-/build
-/dist-server
 /tmp
 /out-tsc
 
-# Custom environment config we generate on each machine so we don't want to track this file.
-/src/environments/environment.ts
+# Angular
+.angular
+
+# Runtime-generated files
+src/assets/configuration.js
 
 # dependencies
 /node_modules
 
+# local development SSL certificate files
+ssl/server.*
+ 
+# profiling files
+chrome-profiler-events.json
+speed-measure-plugin.json
+
 # IDEs and editors
-.idea/
-*.iml
+/.idea
 .project
 .classpath
 .c9/
@@ -29,23 +36,7 @@
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
-*.map
-*.zip
-*.tar.gz
-
-# e2e
-/e2e/*.js
-/e2e/*.map
+.history/*
 
 # System Files
 .DS_Store

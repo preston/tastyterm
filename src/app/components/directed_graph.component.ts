@@ -22,23 +22,25 @@ interface Graph {
 
 @Component({
   selector: "directed-graph",
-  styleUrls: ['../stylesheets/directed-graph.sass'],
+  styleUrls: ['../stylesheets/directed-graph.scss'],
   encapsulation: ViewEncapsulation.None,
   template: `<svg id="visualSVG" width="100%" height="500"></svg>`
 })
 export class DirectedGraphComponent implements OnInit {
-  @Input('links') links: Link[];
-  @Input('nodes') nodes: Node[];
+
+  @Input('links') links: Link[] | null = null;
+  @Input('nodes') nodes: Node[] | null = null;
   @Output() onNodeClicked = new EventEmitter<Node>();
 
-  simulation: Simulation<any, any>;
+  simulation: Simulation<any, any> | null = null;
+
   constructor(private element: ElementRef) {
 
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.nodes || changes.links) {
-      if(!changes.nodes.firstChange || !changes.links.firstChange){
+    if (changes["nodes"] || changes["links"]) {
+      if (!changes["nodes"].firstChange || !changes["links"].firstChange) {
         this.renderGraph();
       }
     }
@@ -55,13 +57,19 @@ export class DirectedGraphComponent implements OnInit {
     const height = +svg.attr('height');
     const textSpace = { x: 12, y: 0 };
 
-    svg.call(d3.zoom()
-      .scaleExtent([1, 1])
-      .on("zoom", () => {
-        svg.selectAll('g')
-          .attr("transform", d3.event.transform)
-      })
-    ).on("wheel.zoom", null);
+    svg.call(d => {
+
+      d3.zoom()
+        .scaleExtent([1, 1])
+        .on("zoom", () => {
+          svg.selectAll('g')
+          // .attr("transform", d3.event.transform)
+        }
+        );
+    }).on("wheel.zoom", null);
+
+
+    // )
 
 
     const color = d3.scaleOrdinal(d3.schemeCategory10);
@@ -76,7 +84,7 @@ export class DirectedGraphComponent implements OnInit {
       .force('charge', d3.forceManyBody())
       .force('center', d3.forceCenter((window.innerWidth - 100) / 2, height / 2));
 
-    if(this.links && this.nodes){
+    if (this.links && this.nodes) {
       console.info("Nodes: ", this.nodes);
       console.info("Links: ", this.links);
       const nodes: Node[] = this.nodes;
@@ -89,8 +97,8 @@ export class DirectedGraphComponent implements OnInit {
         .selectAll('line')
         .data(graph.links)
         .enter()
-        .append( "line" )
-        .style( "stroke-width", 2 )
+        .append("line")
+        .style("stroke-width", 2)
         .attr('marker-end', (d) => "url(#arrowhead)");//attach the arrow from defs;
 
       const arrow = svg.append('defs').append('marker')
@@ -105,7 +113,7 @@ export class DirectedGraphComponent implements OnInit {
         .append('svg:path')
         .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
         .attr('fill', '#b5b5b5')
-        .style('stroke','none');
+        .style('stroke', 'none');
 
       const node = svg.append('g')
         .attr('class', 'nodes')
@@ -125,23 +133,27 @@ export class DirectedGraphComponent implements OnInit {
         .text((d) => {
           return d.label + ' - ' + d.id;
         });
-      svg.selectAll('text').call(d3.drag()
-        .on('start', (d) => this.dragstarted(d))
-        .on('drag', (d) => this.dragged(d))
-        .on('end', (d) => this.dragended(d))
+      svg.selectAll('text').call(f => {
+        d3.drag()
+          .on('start', (d) => this.dragstarted(d))
+          .on('drag', (d) => this.dragged(d))
+          .on('end', (d) => this.dragended(d))
+      }
       ).on("click", (node) => this.nodeClicked(node));
 
-      svg.selectAll('circle').call(d3.drag()
-        .on('start', (d) => this.dragstarted(d))
-        .on('drag', (d) => this.dragged(d))
-        .on('end', (d) => this.dragended(d))
+      svg.selectAll('circle').call(f => {
+        d3.drag()
+          .on('start', (d) => this.dragstarted(d))
+          .on('drag', (d) => this.dragged(d))
+          .on('end', (d) => this.dragended(d))
+      }
       ).on("click", (node) => this.nodeClicked(node));
 
       this.simulation
-        .nodes(<SimulationNodeDatum[]> graph.nodes)
+        .nodes(<SimulationNodeDatum[]>graph.nodes)
         .on('tick', () => {
-          let source = {x:0,y:0};
-          let target = {x:0,y:0};
+          let source = { x: 0, y: 0 };
+          let target = { x: 0, y: 0 };
           link
             .attr('x1', (d: any) => {
               source.x = d.source.x;
@@ -169,29 +181,30 @@ export class DirectedGraphComponent implements OnInit {
 
         });
 
-      this.simulation.force<d3.ForceLink<any, any>>('link')
-        .links(graph.links);
+      this.simulation.force<d3.ForceLink<any, any>>('link')?.links(graph.links);
     }
   }
 
-  nodeClicked(node){
+  nodeClicked(node: Node) {
     this.onNodeClicked.emit(node);
   }
 
-  dragstarted(d) {
-    if (!d3.event.active) { this.simulation.alphaTarget(0.3).restart(); }
+  dragstarted(d: any) {
+    // if (!d3.event.active) {
+    //   this.simulation.alphaTarget(0.3).restart();
+    // }
     d.fx = d.x;
     d.fy = d.y;
   }
-  dragged(d) {
-    d.fx = d3.event.x;
-    d.fy = d3.event.y;
+  dragged(d: any) {
+    // d.fx = d3.event.x;
+    // d.fy = d3.event.y;
   }
 
-  dragended(d) {
-    if (!d3.event.active) {
-      this.simulation.alphaTarget(0);
-    }
+  dragended(d: any) {
+    // if (!d3.event.active) {
+    //   this.simulation.alphaTarget(0);
+    // }
     d.fx = null;
     d.fy = null;
   }

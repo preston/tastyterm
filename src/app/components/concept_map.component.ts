@@ -1,38 +1,39 @@
-import {Component, Output, Inject} from '@angular/core';
-import {UUID} from 'angular2-uuid';
+import { Component, Output, Inject } from '@angular/core';
+// import { v4 as uuidv4 } from 'uuid';
 
 
 
-import {ToasterModule, ToasterService} from 'angular2-toaster/angular2-toaster';
+import {  ToastrService } from 'ngx-toastr';
 
 
-import {Bundle} from '../models/bundle';
-import {ConceptMap} from '../models/concept_map';
+import { Bundle } from '../models/bundle';
+import { ConceptMap } from '../models/concept_map';
 
-import {QuickTermService} from '../services/tastyterm.service';
-import {ConceptMapService} from '../services/concept_map.service';
+import { TastyTermService } from '../services/tastyterm.service';
+import { ConceptMapService } from '../services/concept_map.service';
 
 @Component({
     selector: 'concept-map',
-    templateUrl: '../views/concept_map.pug'
+    // templateUrl: '../views/concept_map.pug'
+    template: '<p>FIXME</p>'
 })
 export class ConceptMapComponent {
 
     // The current selection, if any.
-		conceptMap: ConceptMap;
-		conceptMapBundle: Bundle<ConceptMap>;
-    conceptMaps: Array<ConceptMap>;
+    conceptMap: ConceptMap | null = null;
+    conceptMapBundle: Bundle<ConceptMap> | null = null;
+    conceptMaps: Array<ConceptMap> | null = null;
 
-    constructor(private quicktermService: QuickTermService,
+    constructor(private quicktermService: TastyTermService,
         private conceptMapService: ConceptMapService,
-        private toasterService: ToasterService) {
+        private ToastrService: ToastrService) {
         this.reload();
     }
 
     reload() {
         this.conceptMaps = new Array<ConceptMap>();
         this.conceptMapService.bundle().subscribe(d => {
-            this.conceptMaps = d.entry;
+            this.conceptMaps = d.entry.map(n => n.resource);
         });
     }
 

@@ -1,14 +1,12 @@
 import { Injectable } from "@angular/core";
-import {HttpHeaders, HttpClient, HttpParams} from '@angular/common/http';
-import 'rxjs/add/operator/map';
+import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
 
-import { environment } from '../../environments/environment';
 
 @Injectable()
-export class QuickTermService {
+export class TastyTermService {
 
-  public url: string;
-  public launch: string;
+  public url: string = (window as any)["TASTYTERM_SERVER_URL"];
+  public launch: string | null = null;
 
   // public static JWT_LAUNCH_KEY: string = 'jwt';
   public static STORAGE_BEARER_TOKEN_KEY: string = 'token';
@@ -22,7 +20,7 @@ export class QuickTermService {
       // Headers object is immutable so we must set it anew.
       // See https://angular.io/guide/http#update-headers
       headers = headers
-        .set('Authorization', 'Bearer ' + localStorage.getItem(QuickTermService.STORAGE_BEARER_TOKEN_KEY))
+        .set('Authorization', 'Bearer ' + localStorage.getItem(TastyTermService.STORAGE_BEARER_TOKEN_KEY))
     }
     let params = new HttpParams();
     // return new RequestOptions({ headers: headers, withCredentials: true, params: params });

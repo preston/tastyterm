@@ -1,0 +1,43 @@
+<div class="container-fluid" id="groups">
+  <div class="row">
+    <div class="col-sm-8">
+      <h1>Group management</h1>
+      <div class="pull-right">
+        <button class="btn btn-primary" (click)="create()"><span class="fa fa-plus"></span> Create a group</button>
+      </div>
+      <p class="text-help">Groups are collections of users, and are usually used to ease the permissions management. When a role is assigned to a group, the role is automatically applied to all members.</p>
+      <div class="clearfix"></div>
+      <div class="row">
+        <div class="col-md-4" *ngFor="let group of groups"><a (click)="select(group)">{{group.name}}</a></div>
+      </div>
+      <hr />
+    </div>
+    <div class="col-sm-4" *ngIf="group">
+      <h2>Edit
+        <div class="btn-group pull-right">
+          <button class="btn btn-sm btn-primary" (click)="update(group)"><span class="fa fa-cloud-upload"></span> Save</button>
+          <button class="btn btn-sm btn-danger" (click)="delete(group)"><span class="fa fa-trash"></span> Delete</button>
+        </div>
+      </h2>
+      <hr />
+      <form class="form">
+        <div class="form-group">
+          <label for="group_name">Name</label>
+          <input class="form-control" type="text" name="group_name" [(ngModel)]="group.name" /><small><i>ID: {{group.id}}</i></small>
+        </div>
+        <div class="form-group">
+          <label for="group_description">Description</label>
+          <textarea class="form-control" type="text" name="group_description" [(ngModel)]="group.description"></textarea>
+        </div>
+      </form>
+      <dl>
+        <dt>UUID</dt>
+        <dd>{{group.id}}</dd>
+        <dt>Created</dt>
+        <dd>{{group.created_at}}</dd>
+        <dt>Updated</dt>
+        <dd>{{group.updated_at}}</dd>
+      </dl>
+    </div>
+  </div>
+</div>

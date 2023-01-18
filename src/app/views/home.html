@@ -1,0 +1,187 @@
+<!-- include layout/navigation -->
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="form-group" *ngIf="codeSystem">
+                <select class="form-control form-control-select" id="code_system_select" name="code_system_select" placeholder="Code System" [(ngModel)]="codeSystem" (change)="codeSystemChanged()">
+                    <option *ngFor="let cs of codeSystems" [value]="cs">{{cs.name}} ({{cs.version}})</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <input class="form-control" type="text" placeholder="Search for a term by code, name, or ID..." aria-label="Code Search" [(ngModel)]="searchFilter" (keyup)="search()" required autofocus />
+                <!-- <button role="button" type="submit" [disabled]="!validSearch()" (click)="search()"></button> -->
+                <select class="form-control" (select)="resultSelected($event)" [(ngModel)]="codeSystem">
+                    <option *ngFor="let option of searchResults" [value]="option">
+                        {{ option.display }} - {{option.code}}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <select class="form-control form-control-select" id="result_limit" name="result_limit" [(ngModel)]="resultLimit" placeholder="Limit Results To">
+                    <option *ngFor="let l of getLimits()" [value]="l">{{l}}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" *ngIf="results && results.expansion?.contains">
+        <div class="form-group">
+            <input type="checkbox" name="3d" (click)="chartTypeToggled($event)" [checked]="graphType ==='3D'" />
+            <label class="form-label" for="3d">3D</label>
+        </div>
+
+        <div class="legend-container">
+            <svg class="legend-node" height="20" width="20">
+                <circle cx="10" cy="10" r="9" stroke-width="3" fill="rgb(31, 119, 180)"></circle>
+            </svg>
+            <div>Current Term</div>
+            <svg class="legend-node" height="20" width="20">
+                <circle cx="10" cy="10" r="9" stroke-width="3" fill="rgb(255, 127, 14)"></circle>
+            </svg>
+            <div>Parent</div>
+            <svg class="legend-node" height="20" width="20">
+                <circle cx="10" cy="10" r="9" stroke-width="3" fill="rgb(44, 160, 44)"></circle>
+            </svg>
+            <div>Child</div>
+        </div>
+    </div>
+</div>
+
+<!-- For when a search has been completed, but there are zero results.-->
+<div class="home-container" fxLayout="column" *ngIf="results && results.expansion?.contains == null">
+    <div class="card">No results!</div>
+</div>
+<div class="home-container" fxLayout="column" *ngIf="results && results.expansion?.contains">
+    <div *ngIf="valueSet && valueSetParameters">
+        <code-visualizer [valueSet]="valueSet" [valueSetParameters]="valueSetParameters" [codeSystem]="codeSystem" (onSelection)="nodeClicked($event)"></code-visualizer>
+    </div>
+</div>
+<div class="home-container" *ngIf="valueSetParameters">
+    <div class="card">
+        <div class="row">
+            <div class="col-md-4">
+                <h4>Properties</h4>
+                <table class="table table-condensed table-striped">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let p of valueSetParameters.properties">
+                            <td>{{p}}</td>
+                            <td>{{partValue(p)}}</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+            <div class="col-md-8">
+                <h4>Designations</h4>
+                <table class="table table-condensed table-striped">
+                    <thead>
+                        <tr>
+                            <th>Value</th>
+                            <th>Use</th>
+                            <th>Language</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let d of valueSetParameters.designations">
+                            <td>{{partValue(d)}}</td>
+                            <td>{{d['use']['code']}} ({{d['use']['display']}})
+                                <br /><i>{{d['use']['system']}}</i>
+                            </td>
+                            <td>{{d.language}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="home-container" *ngIf="codeSystem">
+    <div class="card">
+        <div class="row">
+            <div>
+                <h2>&nbsp;{{codeSystem.name}}
+                    <hr />
+                </h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <ul>
+                    <li>
+                        <p mat-line="mat-line"><b>Version</b></p>
+                        <p mat-line="mat-line">{{codeSystem.version}}</p>
+                    </li>
+                    <li>
+                        <p mat-line="mat-line"><b>Name</b></p>
+                        <p mat-line="mat-line">{{codeSystem.name}}</p>
+                    </li>
+                    <li>
+                        <p mat-line="mat-line"><b>Status</b></p>
+                        <p mat-line="mat-line">{{codeSystem.status}}</p>
+                    </li>
+                    <li>
+                        <p mat-line="mat-line"><b>Experimental</b></p>
+                        <p mat-line="mat-line">{{codeSystem.experimental}}</p>
+                    </li>
+                    <!-- <li>
+                        <p mat-line="mat-line"><b>Date</b></p>
+                        <p mat-line="mat-line">{{codeSystem.date}}</p>
+                    </li> -->
+                    <li>
+                        <p mat-line="mat-line"><b>Publisher</b></p>
+                        <p mat-line="mat-line">{{codeSystem.publisher}}</p>
+                    </li>
+                    <li>
+                        <p mat-line="mat-line"><b>Copyright</b></p>
+                        <p mat-line="mat-line">{{codeSystem.copyright}}</p>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-6">
+                <ul>
+                    <li>
+                        <p mat-line="mat-line"><b>Description</b></p>
+                        <p mat-line="mat-line">{{codeSystem.description}}</p>
+                    </li>
+                    <li>
+                        <p mat-line="mat-line"><b>Case Sensitive</b></p>
+                        <p mat-line="mat-line">{{codeSystem.caseSensitive}}</p>
+                    </li>
+                    <li>
+                        <p mat-line="mat-line"><b>Value Set</b></p>
+                        <p mat-line="mat-line">{{codeSystem.valueSet}}</p>
+                    </li>
+                    <li>
+                        <p mat-line="mat-line"><b>Hierarchy Meaning</b></p>
+                        <p mat-line="mat-line">{{codeSystem.hierarchyMeaning}}</p>
+                    </li>
+                    <li>
+                        <p mat-line="mat-line"><b>Compositional</b></p>
+                        <p mat-line="mat-line">{{codeSystem.compositional}}</p>
+                    </li>
+                    <li>
+                        <p mat-line="mat-line"><b>Version Needed?</b></p>
+                        <p mat-line="mat-line">{{codeSystem.versionNeeded}}</p>
+                    </li>
+                    <li>
+                        <p mat-line="mat-line"><b>Content</b></p>
+                        <p mat-line="mat-line">{{codeSystem.content}}</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- include layout/footer -->
